@@ -1,4 +1,12 @@
-# Db data migration using K8S jobs and Helm
+# Db data migration using K8S jobs Helm (Or how I learned to let go & love Helm)
+
+# Abstract
+This article will cover the data migration process between two data stores, the evaluation of possible alternatives, and final outcome. We will cover the difference between sequential, asynchronous, multi-threaded, and distributed applications.
+And finally, we will overview the practical application of Helm and K8S jobs for data migration tasks.
+
+👉 If you care only about the K8S and Helm stuff, skip to **K8S jobs and Helm
+section**. It's ok.
+# Introduction
 
 Recently I was working on data migration. We had 2M records in AWS DocumentDb that we wanted to migrate to AWS RDS PostgreSQL; the actual database tech stack is irrelevant as we will not cover the application-level implementation here. 
 
@@ -7,14 +15,15 @@ Long story short, on top of migrating the data from one source to another and ad
 First, we took the simplest approach: We created a Python script that migrated one record from DocumentDb to RDS. But soon enough, we realized that:
 
 It takes `~3` seconds to migrate one record, and we have `2M` records. 
-So the expected time for complete db migration will be `(2M * 3) / 60 / 60 / 24 = ~69 days`. Obviously, we don't want to wait `69` days, so we had to come up with something with higher throughput.
+So the expected time for complete db migration will be `(2M * 3) / 60 / 60 / 24 = ~69 days`. Well, we don't want to wait `69` days, so we had to come up with something with higher throughput.
+
+<img src="./assets/skeleton.png" alt="alt text" title="image Title" width="600"/>
 
 In general, I always try to keep things as simple as possible and only introduce complexity when it's needed. A wise man once said, 
 > “Premature optimization is the root of all evil. Yet we should not pass 
 up our opportunities in that critical 3%.” (Donald E. Knuth).
 
 So we evaluated multiple alternatives.
-If you care only about the K8S and Helm stuff, skip the Alternatives section. It's ok.
 
 # Alternatives
 
@@ -67,7 +76,7 @@ As a result, we get distributed application that doesn't need synchronization or
 
 ## Batch allocation, or data source slices
 
-As we mentioned above, we will slice the data into chunks and assign it appropriate K8S JOB.
+As we mentioned above, we will slice the data into chunks and assign it an appropriate K8S job.
 This can be illustrated as follows:
 
 <img src="./assets/db_migration_jobs.jpeg" alt="alt text" title="image Title" width="600"/>
@@ -104,6 +113,7 @@ How about `5-hour` migration?
 
 Well, you get the point. We can choose the configuration we want. The cool thing here is that I'm in control; I can go between `1` and `infinity(ish)`. That wouldn't be possible with threads cause there's way a lower limit on an available number of cores.
 
+This is great 🤩! We went from an initial sequential processing time of `69` days to just under a couple of hours 🚀! It's quite cool, don't you think?
 
 ## K8S jobs and Helm
 Ok, we got the theory and general understanding of what we want to achieve here. Now we'll get our hands dirty with K8S and Helm.
@@ -114,9 +124,9 @@ Helm helps you manage Kubernetes applications — Helm Charts help you define, i
 
 In our case, we will use only a subset of its functionality. We're going to define variables and enumeration on the K8S job template.
 
-### Defining our K8S JOB
+### Defining our K8S job
 
-Let's start with a simple job definition as if we do not intend to use Helm yet:
+Let's start with a simple K8S job [5] definition as if we do not intend to use Helm yet:
 > Note: I am using and example docker image - `nginx-helloworld`. This is only for illustration purposes, don't expect it to work out of the box!
 
 ```yaml
@@ -150,6 +160,7 @@ It's definitely possible, but as one platform engineer I'm working with asked me
 
 <img src="./assets/matrix.png" alt="alt text" title="image Title" width="600"/>
 
+I choose to avoid the crap pill.
 
 Let's see how we'll do it using Helm:
 ```yaml
@@ -285,8 +296,8 @@ That's it, I hope it helps.
 
 There are a few things to consider when spawning many K8S pods:
 
-### cluster nodes scaling
-We need to calculate whether our K8S cluster will handle the expected load. In our case defined as AWS node groups. [3]
+### Cluster nodes scaling
+We need to calculate whether our K8S cluster will handle the expected load. In our case defined as AWS node groups [3].
 
 ### Ip range
 It really depends on the subnet VPC CIDR block [4] configuration. For example, IPv4 CIDR of `172.20.0.0/16` will allow a 65k+ IP range but of course, it also depends on how many IPs are already in use. 
@@ -308,3 +319,5 @@ Hope it helped anyone that has to deal with something similar task!
 [3] https://docs.aws.amazon.com/eks/latest/userguide/managed-node-groups.html
 
 [4] https://docs.aws.amazon.com/vpc/latest/userguide/configure-your-vpc.html#vpc-cidr-blocks
+
+[5] https://kubernetes.io/docs/concepts/workloads/controllers/job
