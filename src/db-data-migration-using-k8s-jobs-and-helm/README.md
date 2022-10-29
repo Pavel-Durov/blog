@@ -1,4 +1,4 @@
-# Db data migration using k8s jobs and helm
+# Db data migration using K8S jobs and Helm
 
 Recently I was working on data migration. We had 2M records in AWS DocumentDb that we wanted to migrate to AWS RDS PostgreSQL; the actual database tech stack is irrelevant as we will not cover the application-level implementation here. 
 
@@ -14,11 +14,11 @@ In general, I always try to keep things as simple as possible and only introduce
 up our opportunities in that critical 3%.” (Donald E. Knuth).
 
 So we evaluated multiple alternatives.
-If you care only about the K8S and HELM stuff, skip the Alternatives section. It's ok.
+If you care only about the K8S and Helm stuff, skip the Alternatives section. It's ok.
 
 # Alternatives
 
-## Alternative 1 - multiple local machines
+## Alternative 1 - Multiple local machines
 
 It might seem like the simplest solution. But it comes with its complexity. If something goes wrong, it will be challenging to understand the cause. Having the application distributed to individual machines means that we don't have aggregated place to look at the logs, execution stats etc. Additionally, we might run into local setup issues, slow networking, ISP issues etc. It will also be quite expensive, as we would pay a significant amount of money for the AWS VPC in/out data.
 
@@ -61,7 +61,7 @@ Notice that the number of CPUs no longer limits us; we're limited by the number 
 
 This definition/configuration can be infinite(ish). Of course, there's a physical limit to K8S node instances, but that's a threshold way higher than a single-pod CPU limitation. In our micro view from the db migration job, it might feel as infinite as it gets.
 
-## Going with the Distributed approach
+## Going with the distributed approach
 We went through the approaches and decided to go with the distributed one, as this alternative is simple enough. We have a synchronous Python script ready and tested. We need to multiply it `X` times and assign the data slices to K8S jobs that will run that script.
 As a result, we get distributed application that doesn't need synchronization or any operational overhead. Logs are easily accessible, and job resources are visible.
 
@@ -105,10 +105,10 @@ How about `5-hour` migration?
 Well, you get the point. We can choose the configuration we want. The cool thing here is that I'm in control; I can go between `1` and `infinity(ish)`. That wouldn't be possible with threads cause there's way a lower limit on an available number of cores.
 
 
-## K8S jobs and HELM
-Ok, we got the theory and general understanding of what we want to achieve here. Now we'll get our hands dirty with K8S and helm.
+## K8S jobs and Helm
+Ok, we got the theory and general understanding of what we want to achieve here. Now we'll get our hands dirty with K8S and Helm.
 
-### What's helm?
+### What's Helm?
 
 Helm helps you manage Kubernetes applications — Helm Charts help you define, install, and upgrade even the most complex Kubernetes application [1].
 
@@ -116,7 +116,7 @@ In our case, we will use only a subset of its functionality. We're going to defi
 
 ### Defining our K8S JOB
 
-Let's start with a simple job definition as if we do not intend to use helm yet:
+Let's start with a simple job definition as if we do not intend to use Helm yet:
 > Note: I am using and example docker image - `nginx-helloworld`. This is only for illustration purposes, don't expect it to work out of the box!
 
 ```yaml
@@ -144,11 +144,14 @@ Pretty standard, we defined a job manifest with a docker image reference and two
 
 So what would we do if we wanted to replicate this definition more than once? We could copy-paste this file multiple times, changing the job and batch variables or some kind of bash scripting.
 
-It's definitely possible, but as one platform engineer I'm working with told me:
+It's definitely possible, but as one platform engineer I'm working with asked me: 
+
+> What would you choose?
+
 <img src="./assets/matrix.png" alt="alt text" title="image Title" width="600"/>
 
 
-Let's see how we'll do it using helm:
+Let's see how we'll do it using Helm:
 ```yaml
 {{- range $i, $job := until (.Values.jobsCount | int) }}
 apiVersion: batch/v1
@@ -189,21 +192,21 @@ If you dealt with templating engines, I think this should be quite simple to gra
 
 <img src="https://media2.giphy.com/media/tel4DU3dCiDdVUPhIg/giphy-downsized.gif?cid=6104955ef20a9yllosb2c6d70uogo7skk6fx3ernnrfhcn5u&rid=giphy-downsized.gif&ct=g">
 
-## Running helm
+## Running Helm
 
-First, install helm if needed, [docs](https://helm.sh/docs/intro/install/).
+First, install Helm if needed, [docs](https://helm.sh/docs/intro/install/).
 
 I have the following directory structure in my example:
 ```sell
 $ tree
-├── Chart.yaml         <- helm chart config
+├── Chart.yaml         <- Helm chart config
 ├── templates
-│   ├── job.yaml       <- k8s job
-│   └── namespace.yaml <- k8s namespace
+│   ├── job.yaml       <- K8S job
+│   └── namespace.yaml <- K8S namespace
 └── values.yaml        <- template values
 ```
 
-Where `Chart.yaml`[2] content is simple helm chart config:
+Where `Chart.yaml`[2] content is simple Helm chart config:
 ```
 apiVersion: v2
 name: k8s-job
@@ -220,7 +223,7 @@ metadata:
   name: db-migration
 ```
 
-Running helm as:
+Running Helm as:
 ```shell
 λ helm template . --values ./values.yaml 
 ```
@@ -289,7 +292,7 @@ We need to calculate whether our K8S cluster will handle the expected load. In o
 It really depends on the subnet VPC CIDR block [4] configuration. For example, IPv4 CIDR of `172.20.0.0/16` will allow a 65k+ IP range but of course, it also depends on how many IPs are already in use. 
 
 ## Summary
-We covered the thought process behind the recent data migration I had to do on AWS cloud using K8S jobs and HELM. I think HELM's simplicity and power really shines in this application. 
+We covered the thought process behind the recent data migration I had to do on AWS cloud using K8S jobs and Helm. I think Helm's simplicity and power really shines in this application. 
 
 We haven't covered the application-level logic here as it's peculiar to our case and way beyond the the scope this article.
 
