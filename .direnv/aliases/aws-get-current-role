@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+aws-get-current-role () 
+{ 
+    aws sts get-caller-identity
+}
+aws-get-current-role $@

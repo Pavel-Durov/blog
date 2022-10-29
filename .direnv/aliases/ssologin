@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+ssologin () 
+{ 
+    if [ -n "$1" ]; then
+        echo "Logging in with role $1";
+        aws sso login --profile "$1";
+        python3 -m yawsso --profile "$1";
+        export AWS_PROFILE="$1";
+    else
+        echo "Logging in with role default";
+        aws sso login --profile "default";
+        python3 -m yawsso --default;
+        export AWS_PROFILE="default";
+    fi
+}
+ssologin $@

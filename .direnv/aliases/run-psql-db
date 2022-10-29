@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+run-psql-db () 
+{ 
+    docker run --name postgres-poc -e POSTGRES_PASSWORD=postgres -e POSTGRES_USER=postgres -p 5432:5432 -d postgres-poc
+}
+run-psql-db $@

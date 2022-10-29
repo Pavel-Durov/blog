@@ -1,0 +1,21 @@
+{{- range $i, $job := until (.Values.jobsCount | int) }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: db-migration-job-{{ $i }}
+  namespace: db-migration
+spec:
+  template:
+    spec:
+      containers:
+      - name: db-migration
+        image: nginx-helloworld
+        env:
+          - name: DB_MIGRATE_JOB_NUMBER
+            value: {{ $i | squote }}
+          - name: DB_MIGRATE_BATCH_SIZE
+            value: {{ $.Values.migrationBatchSize | squote }}
+      restartPolicy: Never
+  backoffLimit: 1
+---
+{{ end }}

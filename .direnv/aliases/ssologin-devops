@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+ssologin-devops () 
+{ 
+    ssologin devops
+}
+ssologin-devops $@
