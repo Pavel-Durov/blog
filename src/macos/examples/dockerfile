@@ -1,5 +1,0 @@
-FROM alpine:3.14
-WORKDIR /poc
-COPY ./entrypoint.sh /poc/entrypoint.sh
-ENTRYPOINT [ "/bin/sh", "/poc/entrypoint.sh" ]
-
