@@ -1,4 +1,4 @@
-import main from './main';
+import main from './Main';
 
 main()
 
