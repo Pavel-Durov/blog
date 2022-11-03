@@ -2,7 +2,7 @@
 
 # Abstract
 
-In this article, I will overview the case-sensitivity difference between macOS default filesystem (FS) and Linux filesystem with some practical coding examples and gotchas.
+In this article, I will overview the case-sensitivity difference between macOS default filesystem (FS) and Linux filesystem with some practical examples and gotchas.
 
 # Intro
 Unix and Linux might sound the same to some of us, but they are different beasts. 

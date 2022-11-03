@@ -282,27 +282,62 @@ namespace/db-migration unchanged
 job.batch/db-migration-job-0 created
 job.batch/db-migration-job-1 created
 ```
-Observer the jobs:
+List the jobs:
+
 ```shell
 $ kubectl get jobs -n db-migration
 NAME                 COMPLETIONS   DURATION   AGE
-db-migration-job-0   0/1           116s       116s
-db-migration-job-1   0/1           116s       116s
+NAME                           COMPLETIONS   DURATION   AGE
+db-migration-0    1/1           7m51s        7m51s
+db-migration-1    0/1           7m51s      7m51s
+..
+db-migration-99   0/1           7m41s      7m41s
+db-migration-100  0/1           7m41s      7m41s
+```
+And Pods:
+
+```shell
+$ kubectl get pods -n db-migration
+
+AME                                 READY   STATUS      RESTARTS   AGE
+db-migration-0-5k5nb    0/1     Completed   0          8m44s
+db-migration-1-9splv    1/1     Running     0          8m44s
+...
+db-migration-99-7klz2   1/1     Running     0          8m40s
+db-migration-100-nwlg9  1/1     Running     0          8m40s
 ```
 
-That's it, I hope it helps.
+K8S makes it easy to see which job was completed, which failed, and the pod logs.
+
 
 ## Things to consider
 
 There are a few things to consider when spawning many K8S pods:
 
-### Cluster nodes scaling
+### K8S node scaling and resource allocation
+
+Depending on the application program, pods might require specific memory or CPU resource allocation. When we talk about many jobs requesting these resources at the same time, depending on the cluster scaling strategy it might take time to actually get them. That needs to be tailored to the application, or pre-scale the nodes.
 We need to calculate whether our K8S cluster will handle the expected load. In our case defined as AWS node groups [3].
 
 ### Ip range
 It really depends on the subnet VPC CIDR block [4] configuration. For example, IPv4 CIDR of `172.20.0.0/16` will allow a 65k+ IP range but of course, it also depends on how many IPs are already in use. 
 
+## Theory meets practice
+
+### K8S Control Plane
+As with anything in our practice, everything works fine in our local environment but when it needs to run somewhere else... Different story.
+Spawning these jobs on actual K8S clusters gave us this error from the K8S control plane:
+
+>Resource: "batch/v1, Resource=jobs", GroupVersionKind: "batch/v1, Kind=Job"
+Name: "db-migration-240", Namespace: "db-migration"
+from server for: "STDIN": Get "...": dial tcp: lookup 
+
+That error came when we did more than 100 jobs at a time. So then we had to batch that as well! 
+
+That's it :)
+
 ## Summary
+
 We covered the thought process behind the recent data migration I had to do on AWS cloud using K8S jobs and Helm. I think Helm's simplicity and power really shines in this application. 
 
 We haven't covered the application-level logic here as it's peculiar to our case and way beyond the the scope this article.
