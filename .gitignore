@@ -1,1 +1,6 @@
 .DS_Store
+
+pypy2.7-v7.3.9-src*
+pypy2.7-v7.3.9-*
+*-c
+*.pyc

@@ -1,0 +1,43 @@
+[aedfe9591c8f] {jit-log-opt-loop
+# Loop 1 (tuple.contains [str]) : entry bridge with 21 ops
+[i0, p1, p2]
+debug_merge_point(0, 0, 'tuple.contains [str]')
++219: p3 = getarrayitem_gc_r(p1, i0, descr=<ArrayP 8>)
++238: guard_class(p3, ConstClass(W_BytesObject), descr=<Guard0x7fab781797c0>) [i0, p2, p1, p3]
++250: guard_nonnull_class(p2, ConstClass(W_BytesObject), descr=<Guard0x7fab78179820>) [i0, p2, p1, p3]
++275: i6 = instance_ptr_eq(p3, p2)
++278: guard_false(i6, descr=<Guard0x7fab78167f58>) [i0, p2, p1, p3]
++284: p7 = getfield_gc_r(p3, descr=<FieldP pypy.objspace.std.bytesobject.W_BytesObject.inst__value 8 pure>)
++288: p8 = getfield_gc_r(p2, descr=<FieldP pypy.objspace.std.bytesobject.W_BytesObject.inst__value 8 pure>)
++292: i9 = strlen(p8)
++296: i11 = int_gt(i9, 1)
++300: guard_true(i11, descr=<Guard0x7fab78167fa0>) [i0, p2, p1, p3]
++306: i12 = ptr_eq(p7, p8)
++309: guard_false(i12, descr=<Guard0x7fab48068020>) [i0, p2, p1, p3]
++315: i14 = call_i(ConstClass(ll_streq__rpy_stringPtr_rpy_stringPtr), p8, p7, descr=<Calli 1 rr EF=0 OS=24>)
++341: guard_false(i14, descr=<Guard0x7fab78179880>) [i0, p2, p1, p3, i14]
++350: i16 = int_add(i0, 1)
++354: i17 = arraylen_gc(p1, descr=<ArrayP 8>)
++359: i18 = int_lt(i16, i17)
++362: guard_false(i18, descr=<Guard0x7fab48068068>) [i0, p2, p1, p3, i14]
++368: leave_portal_frame(21)
++375: finish(ConstPtr(ptr20), descr=<DoneWithThisFrameDescrRef object at 0x10cecbb78>)
++496: --end of the loop--
+[aedfe95b64b4] jit-log-opt-loop}
+[aedfe9a86763] {jit-log-opt-bridge
+# bridge out of Guard 0x7fab48068068 with 12 ops
+[i0, p1, p2, p3, i4]
++62: guard_false(i4, descr=<Guard0x7fab781798e0>) [i0, p1, p2, p3, i4]
++71: i6 = int_add(i0, 1)
++75: i7 = arraylen_gc(p2, descr=<ArrayP 8>)
++80: i8 = int_lt(i6, i7)
++83: guard_true(i8, descr=<Guard0x7fab480680b0>) [i0, p1, p2, p3, i4]
+debug_merge_point(0, 0, 'tuple.contains [str]')
++89: p9 = getarrayitem_gc_r(p2, i6, descr=<ArrayP 8>)
++94: guard_class(p9, ConstClass(W_BytesObject), descr=<Guard0x7fab480680f8>) [i0, p1, p2, p3, i4]
++107: i11 = instance_ptr_eq(p9, p1)
++110: guard_true(i11, descr=<Guard0x7fab48068140>) [i0, p1, p2, p3, i4]
++116: leave_portal_frame(21)
++123: finish(ConstPtr(ptr13), descr=<DoneWithThisFrameDescrRef object at 0x10cecbb78>)
++240: --end of the loop--
+[aedfe9a8b04d] jit-log-opt-bridge}
