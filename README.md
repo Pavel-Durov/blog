@@ -19,5 +19,3 @@
 # TODO
 - src/pypy-stackless/README.md
 - src/aws-resources-k8s-iam-roles-service-accounts/README.md
-
-graceful-termination-sigterm-in-unix-processes
