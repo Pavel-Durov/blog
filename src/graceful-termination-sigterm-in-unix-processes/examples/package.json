@@ -1,0 +1,17 @@
+{
+  "name": "examples",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "start": "ts-node index.ts"
+  },
+  "dependencies": {
+    "@hapi/hapi": "^20.2.2",
+    "@types/node": "^18.11.9",
+    "ts-node": "^10.9.1"
+  },
+  "devDependencies": {
+    "@types/hapi__hapi": "^20.0.13"
+  }
+}

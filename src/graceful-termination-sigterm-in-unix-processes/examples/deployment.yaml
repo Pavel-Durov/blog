@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: poc-namespace
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: poc-deployment
+  namespace: poc-namespace
+spec:
+  selector:
+      matchLabels:
+        app: poc-app
+  template:
+    metadata:
+      labels:
+        app: poc-app
+    spec:
+      containers:
+      - name: "poc"
+        imagePullPolicy: Always
+        image: "poc"
+        ports:
+        - containerPort: 3000
