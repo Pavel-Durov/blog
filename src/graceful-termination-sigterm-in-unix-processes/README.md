@@ -187,11 +187,12 @@ $ curl -v http://0.0.0.0:3000/work
 curl: (7) Failed to connect to 0.0.0.0 port 3000 after 3 ms: Connection refused
 ```
 
-The same error that we'll get if there's no server at all!
+We'll get the same error if there's no server at all!
 
-But that's all you need to do gracefully termination of node processes. Pretty easy 😃.
+But that's all we need to do for the graceful termination of node processes. Pretty easy 😃.
 
-# Sending SIGTERM to K8S Pds
+# Sending SIGTERM to K8S Pods
+
 
 As we mentioned, whenever the K8S Pod is terminated, it is sent a `SIGTERM` signal.
 Similarly to the way we used `kill` command for local processes, we can terminate pods using `delete` command:
