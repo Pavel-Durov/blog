@@ -1,3 +1,3 @@
-export interface OrderPort {
+export interface DbPort {
   saveOrder(order: any): boolean;
 }
