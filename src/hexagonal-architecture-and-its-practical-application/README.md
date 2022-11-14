@@ -1,4 +1,5 @@
 # On Hexagonal Architecture (aka Ports and Adapters), DDD, DI & IOC
+
 # Abstract
 
 In this article, I will overview the concept of **Hexagonal Architecture (HA)**, the problem it addresses, its benefits, implications and some practical examples illustrated via code and diagrams.
@@ -15,15 +16,16 @@ In 2005, Alistair Cockburn presented **Hexagonal Architecture** as a solution to
 
 The problem with layered architecture is that we (engineers) tend to take the separation of layers lightly. In layered applications, the domain logic usually "leaks" between layer boundaries.
 
-Projects without well-defined domains are hard to reason about and maintain. Additionally, in practice, the architecture is usually quite complex for large projects, and it's hard to project it into rigid,one-dimensional layer drawings.
+Projects without well-defined domains are hard to reason about and maintain. Additionally, in practice, the architecture is usually quite complex for large projects, and it's hard to project it into rigid, one-dimensional layer drawings.
 
 In **HA** we don't have this dimensional restriction. We have the application on the inside communicating using abstraction over interfaces with the external world. Strict boundaries, abstraction and separation of concerns are the key here.
 
 ## HA vs N-Tier Architecture
 
-Conceptually, our software has little difference between UI, Database, Network or other layers. All these software components can be looked at as "black boxes" that have inputs and outputs. With Layered architectural diagrams, we naturally separate layers by type and not by functionality; UI at the top, Database at the bottom, and we throw something in the middle. 
+Conceptually, our software has little difference between UI, Database, Network or other layers. All these software components can be looked at as "black boxes" that have inputs and outputs. With Layered architectural diagrams, we naturally separate layers by type and not by functionality; UI at the top, Database at the bottom, and we throw something in the middle.
 
 When we run the same software in different modes, such as Production, Testing etc, we want to have the ability to replace one type of interaction with another; UI with a test suite, Actual Database with an in-memory instance, etc... In other words, we want the same functionality but different implementations. Well, that's what HA is all about ☝️.
+
 # HA components
 
 ## Domain
@@ -60,7 +62,7 @@ This concept is referred to as Left-Right Asymmetry [2]
 
 A hexagon is a six-sided polygon, so one might think that there are `6` components in **HA**, but we counted only `3` so far 🤔! If anything, it should've been called Triangular Architecture!
 
-According to the author, the term "**Hexagonal**" is used not because of the number `6` significance or the beast 🤘 [2]. It's about aesthetics and convenience. The idea is to allow architectural drawings with enough room to insert both **Ports** and **Adapters** as needed without the constraints of a one-dimensional layered drawing.
+According to the author, the term "**Hexagonal**" is used not because of the number `6` significance or the beast 🤘. It's about aesthetics and convenience [2]. The idea is to allow architectural drawings with enough room to insert both **Ports** and **Adapters** as needed without the constraints of a one-dimensional layered drawing.
 
 # HA features
 
@@ -150,10 +152,11 @@ Let's break it down into software components:
 
 **db-mock** - db mock, used for testing, implements **db-port**
 
-Have a look at **http-server** adapter. Why it has no port? Well, because it doesn't make sense. We're building a server-side service where **http-server** is the main interface of our application, are we going to reuse its adapter in some way from within our application? It looks like a one-directional communication **http-server** -> **core** to me. Please reach out if you strongly disagree and think we should have a port for it!
+Have a look at **http-server** adapter. Why it has no port? Well, because it doesn't make sense. We're building a server-side service where **http-server** is the main interface of our application, are we going to reuse its **Port** in some way or call it from the core? It looks like a one-directional communication **http-server** -> **core** to me. Please reach out if you strongly disagree and think we should have a port for it!
+
 ## IoC and Loose coupling
 
-The application **Core** can reference any adapters, but as we said, not directly, only through abstraction. One way to achieve that is by using **Inversion of Control (IOC)** and **Dependency Injection (DI)**. The idea is simple - instead of a **Core** module referencing other modules directly, i.e. knowing exactly where to find the **DB** adapter, all it's aware of is its interface. **Core** has zero knowledge of the interface implementation. Therefore the instance behind the interface can be an **SQL DB**, **FileStorage**, or mocked instance.
+The application **Core** can reference any adapters, but as we said, not directly, only through abstraction. One way to achieve that is by using **Inversion of Control (IOC)** and **Dependency Injection (DI)**. The idea is simple - instead of a **Core** module referencing other modules directly, i.e. knowing exactly where to find the **DB** adapter, all it's aware of is its interface. **Core** has zero knowledge of the interface implementation. Therefore the instance behind the interface can be an **SQL DB**, **FileStorage**, or mocked one.
 
 Here's an example of tightly-coupled code:
 
@@ -167,7 +170,7 @@ export class Order {
   constructor(){
     this.db = new Db()
   }
-  
+
   placeOrder(){
     this.db.saveOrder({})
   }
@@ -201,7 +204,7 @@ The main idea here is that this code will be hard to change. Also, notice that o
 
 Suppose I want to use another **Db** logic such as mocked one I will need to update all its references. We can live with that, but we can do better!
 
-Alternative (with IOC):
+Alternative (with IoC):
 
 ```TypeScript
 // file: db-adapter.ts
@@ -242,7 +245,7 @@ const order1 = new Order(new Db())
 order1.placeOrder()
 ```
 
-Here we don't have tight coupling between the **Core** component and the **Adapter**. **Core** knows about the **Port** interface and that's it! We can now define different behaviours of our Ports!, for example:
+Here we don't have tight coupling between the **Core** component and the **Adapter**. **Core** knows about the **Port** interface and that's it! We can now define different behaviours of our **Port**!
 
 ```Typescript
 import { OrderPort } from "./db-port";
@@ -272,23 +275,20 @@ test.placeOrder()
 Boom 🤯! Revolutionary. Did your head explode?
 You've just experienced the power of Dependency Injection (DI) and Inversion of Control (IoC) 💪.
 
-With this simple example, we need to configure each object constructor with its dependencies. It might be too much. As with anything, there're multiple ways of achieving the same thing. Most of the material about **DI** and **IoC** will cover more complex configurations such as [IoC Containers](https://wiki.c2.com/?IocContainerComparison)[7]. Such containers might appear overwhelming, but they all have their place and use cases. Remember that it's all based on simple concepts.
+In this simple example, we need to configure each object constructor with its dependencies. It might be too much. As with anything, there're multiple ways of achieving the same thing. Most of the material about **DI** and **IoC** will cover more complex configurations such as [IoC Containers](https://wiki.c2.com/?IocContainerComparison)[7]. Such containers might appear overwhelming, but they all have their place and use cases. Remember that it's all based on simple concepts.
 
 ## Configuration Management
 
 This might not be 100% on the topic of **HA** and **IoC**, but I think it's important to mention it anyway.
-Software misconfiguration is a very common source of bugs. It always happens; using HTTP instead of HTTPS protocol, wrong module import or invalid environment variables. Therefore, it makes sense to keep our configuration isolated in one place. A single place of truth that defines its behaviour. We can also define our **Adaptors** there in **HA**. For example, the configuration of our logger type, whether it will stream the logs to a remote aggregation service or stream it to a local file, should be defined in one place. It will make our life easier when we try to understand what happened to our logs. In contrast, if each module is responsible for its log configuration, we might end up with different parts of our software producing different types of logs - probably a bad idea.
+Software misconfiguration is a very common source of bugs. It always happens; using HTTP instead of HTTPS protocol, wrong module import or invalid environment variables. Therefore, it makes sense to keep our configuration isolated in a single place of truth that defines its behaviour. We can also define our **Adaptors** there in **HA**. For example, the configuration of our logger type, whether it will stream the logs to a remote aggregation service or stream it to a local file, should be defined in one place. It will make our life easier when we try to understand what happened to our logs. In contrast, if each module is responsible for its log configuration, we might end up with different parts of our software producing different types of logs - probably a bad idea.
 
 # Summary
 
-We started with **Hexagonal Architecture** and then talked about **N-Tier** architecture and how these two differ. We covered more abstract topics, such as **Separation of Concerns** and **Inversion of Control**, and briefly touched on **Domain-Driven** Design and Application configuration management. With **HA**, we are more flexible in introducing changes. We have defined the application domain and enforce our application's testability.
+We started with **Hexagonal Architecture** and then talked about **N-Tier** architecture and how these two differ. We covered more abstract topics, such as **Separation of Concerns** and **Inversion of Control**, and briefly touched on **Domain-Driven Design** and Application configuration management. With **HA**, we are more flexible in introducing changes, defining the application domain and enforcing the application's testability.
 
-We started with **Hexagonal Architecture** and then talked about **N-Tier** architecture and how these two differ. We covered more abstract topics, such as **Separation of Concerns** and **Inversion of Control**, and briefly touched on **Domain-Driven** Design and Application configuration management. With **HA**, we are more flexible in introducing changes, we are defining the application domain and enforcing the application's testability.
+This write-up was for my own sake of understanding and organising my thoughts as it was about knowledge sharing. I hope it was helpful. If you have questions/objections/observations/complaints, don't hesitate to reach out!
 
-This write-up was for my own sake of understanding and organising my thoughts as it was about knowledge sharing. I hope it was helpful. If you have any questions/objections/observations/complaints, don't hesitate to reach out!
-
-This write-up was for my own sake of understanding and organising my thoughts as it was about knowledge sharing. I hope it was helpful. If you have any questions/objections/observations/complaints, don't hesitate to reach out!
-If you want to learn more; have a look at this [YouTube](https://www.youtube.com/watch?v=th4AgBcrEHA) recording by Alistair Cockburn, the quality is not excellent, but its content is very valuable. And explore the provided references 👇.
+If you want to learn more, check out this [this](https://www.youtube.com/watch?v=th4AgBcrEHA) recording of Alistair Cockburn, the quality is not great, but its content is very valuable. And explore the provided references 👇.
 
 # References
 
