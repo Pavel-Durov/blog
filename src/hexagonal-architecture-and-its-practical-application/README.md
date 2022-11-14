@@ -281,9 +281,14 @@ Software misconfiguration is a very common source of bugs. It always happens; us
 
 # Summary
 
-We started with **Hexagonal Architecture** and then talked about **N-Tier** architecture and how these two differ. We covered more abstract topics, such as **Separation of Concerns** and **Inversion of Control**, and briefly touched on **Domain-Driven** Design and Application configuration management.
+We started with **Hexagonal Architecture** and then talked about **N-Tier** architecture and how these two differ. We covered more abstract topics, such as **Separation of Concerns** and **Inversion of Control**, and briefly touched on **Domain-Driven** Design and Application configuration management. With **HA**, we are more flexible in introducing changes. We have defined the application domain and enforce our application's testability.
+
+We started with **Hexagonal Architecture** and then talked about **N-Tier** architecture and how these two differ. We covered more abstract topics, such as **Separation of Concerns** and **Inversion of Control**, and briefly touched on **Domain-Driven** Design and Application configuration management. With **HA**, we are more flexible in introducing changes, we are defining the application domain and enforcing the application's testability.
 
 This write-up was for my own sake of understanding and organising my thoughts as it was about knowledge sharing. I hope it was helpful. If you have any questions/objections/observations/complaints, don't hesitate to reach out!
+
+This write-up was for my own sake of understanding and organising my thoughts as it was about knowledge sharing. I hope it was helpful. If you have any questions/objections/observations/complaints, don't hesitate to reach out!
+If you want to learn more; have a look at this [YouTube](https://www.youtube.com/watch?v=th4AgBcrEHA) recording by Alistair Cockburn, the quality is not excellent, but its content is very valuable. And explore the provided references 👇.
 
 # References
 
