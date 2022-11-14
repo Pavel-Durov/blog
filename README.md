@@ -16,6 +16,8 @@
 
 - [Graceful Termination - SIGTERM in UNIX processes, containers and K8S](./src/graceful-termination-sigterm-in-unix-processes/README.md)
 
+- [Hexagonal Architecture and Its practical application](./src/hexagonal-architecture-and-its-practical-application/README.md)
+
 # TODO
 - src/pypy-stackless/README.md
 - src/aws-resources-k8s-iam-roles-service-accounts/README.md
