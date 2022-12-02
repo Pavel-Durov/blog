@@ -1,5 +1,7 @@
 # collection of posts and articles
 
+- [Cross Platform CLI Application with GO and Cobra](./src/cross-platform-cli-apps-with-go-and-cobra/README.md)
+
 - [Python Logging Module](src/PythonLoggingModule/README.md)
 
 - [Linux VNC server & macOS VNC client](./src/linux-vnc-server-macos-vnc-client/README.md)
