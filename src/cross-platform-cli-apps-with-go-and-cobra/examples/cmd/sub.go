@@ -7,7 +7,7 @@ import (
 var subCmd = &cobra.Command{
 	Use:   "sub",
 	Short: "Sub operator",
-	Long:  `Sub operator, subtracts two integers and returns the result.`,
+	Long:  `Sub operator, subtracts two integers and prints the result.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		num1, _ := cmd.Flags().GetInt32("n1")
 		num2, _ := cmd.Flags().GetInt32("n2")

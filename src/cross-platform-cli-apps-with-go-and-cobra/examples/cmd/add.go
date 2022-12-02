@@ -7,7 +7,7 @@ import (
 var addCmd = &cobra.Command{
 	Use:   "add",
 	Short: "Add operator",
-	Long:  `Add operator, adds two integers and returns the result.`,
+	Long:  `Add operator, adds two integers and prints the result.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		num1, _ := cmd.Flags().GetInt32("n1")
 		num2, _ := cmd.Flags().GetInt32("n2")

@@ -11,7 +11,7 @@ import (
 var rootCmd = &cobra.Command{
 	Use:   "[command]",
 	Short: "A CLI calculator",
-	Long:  `A CLI calculator that can add and subtractwo numbers.`,
+	Long:  `A CLI calculator that can add and subtract two numbers.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		username := viper.Get("username")
 		if username != nil {
