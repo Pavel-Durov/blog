@@ -20,6 +20,12 @@
 
 - [Hexagonal Architecture and Its practical application](./src/hexagonal-architecture-and-its-practical-application/README.md)
 
+
+## Assets
+
+Cover: 1600 x 840
+OG: 1200px X 630px
+
 # TODO
 - src/pypy-stackless/README.md
 - src/aws-resources-k8s-iam-roles-service-accounts/README.md
