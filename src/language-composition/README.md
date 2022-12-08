@@ -1,30 +1,33 @@
 # Programming Languages Composition
 ## Abstract
-We have many Programming Languages (PL) today, each with its speciality and applications. But still, traditional software is written using a single programming language. We have tools and processes that allow language compositions, but these tools are cumbersome, slow and complex. This article will overview the Programming Language Composition (PLC) problem space and the applied composition techniques.
+
+We have a variety of Programming Languages (PL) today, each with its speciality and features. But still, traditional software is written using a single programming language. We have tools and processes that allow language compositions, but these tools are cumbersome, slow and complex. This article will overview the Programming Language Composition (PLC) problem space and the applied composition techniques.
 
 ## Introduction
-Realistic software is usually not bound to a single domain; storage, serialisation, network, security, concurrency, and domain-specific problems are just a few examples. Domain-Specific Languages (DSL) are built and optimised for specific problems. Some general-purpose languages are better suited for performance-intensive applications, while others have better readability or broader library support. 
-Language composition can enable us to write software that is not restricted by single PL limitations, allowing us to take advantage of different language features flexibly.
-Programming Language Composition (PLC)
-It happened to me multiple times when I was writing software in one PL, and I needed some functionality or library available only in another PL. And I was stuck! Usually, I default to writing a library wrapper, invoking a CLI tool or some executable.
-Generally, I see PLC as a solution for fast prototyping or experimentation with PL features. If we were not restricted in PL integration, we would be able to migrate legacy software in an iterative way, module by module, function by function. Or write domain logic in a readable PL (let's say Python) and implement the rest in a more performant language (Rust, for example)
+Realistic software is usually not bound to a single domain; storage, serialisation, network, security, concurrency, and domain-specific problems are just a few examples. Domain-Specific Languages (DSL) are built and optimised for specific problems. Some general-purpose languages are better suited for performance-intensive applications, while others have better readability or broader library support.
+PLC is a computer program written in multiple programming languages. PLC can enable us to write software that is not restricted by single PL limitations, allowing us to take advantage of different language features flexibly.
+
+## Programming Language Composition (PLC)
+It happened to me multiple times when I was writing software in one PL, and I needed some functionality or library available only in another PL. And I was stuck! Usually, in that case, I default to writing some wrapper (aka glue code), invoking a CLI tool or some executable.
+I see PLC as a solution for fast prototyping or experimentation with PL features. If we were not restricted in PL integration, we would be able to migrate legacy software in an iterative way, module by module, function by function. Or write domain logic in a readable PL (let's say Python) and implement the rest in a more performant language (for example, Rust).
 Of course, having multiple languages in the same project creates more complexity. It requires engineers to understand and be proficient in more than one language. But if we put this cognitive load aside. And do some blue-sky thinking; why would we want to build restrictive software solutions locked in one paradigm or ecosystem? After all, we know that we will reach a dead end.
 Some tools and processes allow language composition. However, it comes with runtime performance impact and operational costs, such as integration effort, and a need for better tooling, such as debugging and profiling.
 Let's have an overview of these methods.
 
 ###  Distributed Applications (DA)
-Distributed Applications (DA) is a highly adopted approach in the IT industry that addresses this problem. Usually referred to as Microservices Architecture these days, it doesn't have to be "micro" per se. DA are multiple components that act as one system, communicating over the networking protocol. Since the network layer abstracts components' internals, it allows these components to be implemented independently, using any language or framework, as long as it has a well-established communication protocol. However, it requires the application to be distributed and comes with significant infrastructure, networking and deployment complexity. Networking communication also comes with higher latency when compared to in-memory communication.
+
+Distributed Applications (DA) is a highly adopted approach in the IT industry that addresses this problem. Usually referred to as Microservices Architecture these days, it doesn't have to be "micro" per see to be distributed. DA are multiple components that act as one system, communicating over the networking protocol. Since the network layer abstracts components' internals, it allows these components to be implemented independently, using any language or framework, as long as it has a well-defined communication protocol. However, it requires the application to be distributed and comes with significant infrastructure, networking and deployment complexity. Networking communication also comes with higher latency when compared to in-memory communication.
 
 ### Process-based - Fork, Exec, Spawn
 With a Process-based approach, the software is composed of a collection of processes. One process can invoke another and create this relationship with internal abstraction on the Operating System (OS) level.
-Fork - an operation where a process creates a copy of itself. 
-Exec - an operation that runs an executable in an existing process context. 
-Spawn - loads and executes a new "child" process. Where the "parent" process manages this "child". 
+Fork - an operation where a process creates a copy of itself.
+Exec - an operation that runs an executable in an existing process context.
+Spawn - loads and executes a new "child" process. Where the "parent" process manages this "child".
 
 ### Process-based - IPC
-Yet another process-based approach is Inter-Process Communication (IPC). IPC is a mechanism that allows multiple processes on the same machine to communicate over the local network or memory. 
-Shared Memory - Multiple processes communicate using the same memory. One produces data, and the other consumes it. This communication is self-explanatory.
-Messaging Passing -Processes communicate without having shared a memory. Instead, they are using messages. Similarly to the traditional Client-Server model, the connection is established over the network, and messages are sent from one process to another.
+Yet another process-based approach is Inter-Process Communication (IPC). IPC is a mechanism that allows multiple processes on the same machine to communicate over the local network or memory.
+Memory - Multiple processes communicate using the same memory. One produces data, and the other consumes it.
+Messaging-Processes communicate without sharing a memory. Instead, they are using messages. Similarly to the Client-Server model, the connection is established over the network, and messages are sent from one process to another.
 
 ### Foreign Function Interface (FFI)
 Some of the most popular applications are built with a mix of languages. Firefox browser is one example; made with C/C++, Java, JavaScript and Python (maybe more). With this kind of project, it is a general practice to write an application base system in low-level programming languages and extend it with high-level languages. The main reason for adopting multiple programming languages is the code reuse of existing software; another is to take advantage of language-specific features [7].
@@ -38,13 +41,20 @@ Another challenge that the Unipycation case study showed is semantic friction; c
 Eco [7] language composition editor provides the fill of an ordinary text editor while using syntax-direct editing behind the scenes. Unlike traditional editors, Eco operates and saves ﬁles as tree structures rather than as a conventional text-based source ﬁles. This again creates friction when integrating with widely adopted engineering practices and tools, such as version control systems that are usually text-based.
 The Unipycation case study shows that it can compose multiple languages without compromising performance with minimal engineering effort. But after all, this case study is experimental and not Production Ready in any form.
 
-### Web stack (TODO)
+### JS-Transpiled Web
 
-We have JavaScript (JS), the primary language that runs in our browsers. Recently we had a new addition - WebAssembly (WASM), but still JS is the de-facto language of the web.
-JS isn't perfect, so we came with all these supersets, transpired languages that we can write with strong types (TypeScript), or Haskell-like functional programming (ELM), but then we compile them and we run JS in our prowsers.
-What will happen if I have a library written, let's say, in CoffeeScript, and I want to import it to my TypeScript (TS)application? I need to compile it to JavaScript first inorder to use it TS. And what if I wanted to use three different libraries from three different PL? I would need to go through the same transpile process over and over again. 
+JavaScript (JS) is the primary language that runs in our browsers. Recently we had a new addition of WebAssembly (WASM), but still, JS is the de-facto language of the web. 
+JS has its limitations. So we came up with different js-transpired languages to address these constraints, enabling us to write with strongly-typed code (TypeScript) or Haskell-like functional programming (ELM). Still, they all transpile into JS that runs in our browsers.
+What will happen if we have a project written, let's say, in CoffeeScript, and we need to import a TypeScript (TS) library? We will need to convert our script to JS and import it. What if we use three different libraries implemented in three PLs? We would need to go through the same transpile process over and over again. 
+This is another place for the PLC application that can be a good fit.
 
-## Summary (TODO)
+
+## Summary
+
+In this article, we overviewed the problem of Programming Language Composition (PLC). As far as my research goes, I've enumerated all the existing solutions we have today. The state of language composition and integration today is far from ideal, cumbersome and convoluted, in my opinion, and I hope we see some improvements in that domain soon.
+Since we have solutions that work, no matter the cost, we continue using them without re-evaluating them from time to time. What we need is precisely that re-evaluation.
+This write-up is for my own sake of understanding and the organisation of my thoughts as it was about knowledge sharing. It's based on my recent research proposal for a part-time PhD. I hope it was helpful. 
+If you have questions/objections/observations/complaints, don't hesitate to reach out!
 
 References
 [1] Beazley, D.M., 1996, July. SWIG: An Easy to Use Tool for Integrating Scripting Languages with C and C++. In Tcl/Tk Workshop (Vol. 43, p. 74).
