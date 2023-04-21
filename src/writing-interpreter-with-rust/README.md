@@ -1,51 +1,62 @@
+# Writing interpreter in Rust using grmtools.
+
 ## Introduction
 
-In this article we will overview of the process of writing an interpreter with Rust programming language.
-We will use `grmtools` crate to handle our parsing, we'll define our tokens and basic math expression evaluation.
+This article overviews the process of writing an interpreter with Rust programming language. We will use the `grmtools` Rust crate to help with the parsing. We will define tokens of our language and create math addition and multiplication expressions. We will also cover some basic terms and concepts related to writing an interpreter as we go. This writing is heavily based on `grmtools` [Quickstart](https://softdevteam.github.io/grmtools/master/book/quickstart.html) [1]. 
 
 
-# What's YACC?
+## What are grmtools?
 
-YACC (Yet Another Compiler-Compiler) is a LALR (Look Ahead Left-to-Right Rightmost Derivation) parser generator.
-But dont ler these acronyms scare you. LALR parser is just a specific type of a parser for programming languages.
+`Grmtools` is a collection of Rust libraries for text parsing at compile and run times. We will focus on the compile-time YACC features of `grmtools` as it will provide us with the framework for parsing instead of writing one from scratch.
 
-Parser is based on a formal grammar definition, its that part of a compiler that tries to make sense of the source code.
+## What's YACC?
 
-YACC is written in a similar notation to Backus–Naur Form (BNF), which will be similar to what we're going to use. The only diffrence is that we'll have some Rust code and types involved.
+**YACC** (Yet Another Compiler-Compiler) is an **LALR** (Look Ahead Left-to-Right Rightmost Derivation) parser generator [2].
 
-Read more: https://www.geeksforgeeks.org/introduction-to-yacc/
-Read more: https://en.wikipedia.org/wiki/Backus%E2%80%93Naur_form
+Don't let these acronyms scare you. **LALR** parser is just a type of **Parser**. A **Parser** is a compiler component that translates the raw source code into a meaningful structured form.
 
-# Why Yacc?
-
-We don't have to use YACC or YACC-compartible tools like `grmtools`, but it saves us time from defining our own Lexers and Parsers from scratch.
-If you do want to do implement is from scratch I would suggest reading one of these books:
-
-https://www.goodreads.com/book/show/58661468-crafting-interpreters
-https://www.goodreads.com/en/book/show/32681092-writing-an-interpreter-in-go
-
-## Getting hands-on
-
-We're going to beusing a tool called grmtools for our task.
-
-Grmtools includes both a Yacc-style LR parser (lrpar) and a lex-style lexer (lrlex). 
-
-Lexer - breaks input up into individual lexemes and the 
-
-Parser - checks to see if the lexemes conform to a grammar. As the parser executes, it can either create a generic parse tree, or execute user-specified Rust code.
-
-See quick start: https://softdevteam.github.io/grmtools/master/book/quickstart.html
+**YACC** is written in a similar notation to **BNF** (Backus–Naur Form) [3], which will resemble what we will use. The only difference is that we'll have some Rust code and types involved.
 
 
+## Why YACC?
 
-## New cargo project
+We don't have to use **YACC** or any **YACC-compatible** tools like `grmtools`, but it saves us time from defining our own Lexers and Parsers from scratch.
+If you do want to implement lexing and parsing from scratch, I would suggest reading one of these books:
 
-I'm going to call my project `coconut`, just cause I can.
+[Crafting Interpreters](https://www.goodreads.com/book/show/58661468-crafting-interpreters)
 
+[Writing Interpreter in Go](https://www.goodreads.com/en/book/show/32681092-writing-an-interpreter-in-go)
+
+
+## Getting started
+
+Grmtools includes a **YACC-style** **Parser** called `lrpar` and a 
+**Lexer** called `lrlex`. We will also use `cfgrammar` which we'll use to identify the **YACC** variant we will use - `YaccKind::Grmtools`.
+
+
+### Terminology:
+
+**Lexeme** - Part of the source code text
+
+**Lexer** - Breaks the text into individual lexemes
+
+**Parser** - Validates whether lexemes fit formal grammar
+
+**Tokens** - Parsed **Lexemes** with the assigned type
+
+
+In the next sections, we will define our **Lexer** and **Parser** in a **YACC-y** way using `grmtools` libraries in a Rust project.
+
+## Creating new project
+
+I will call my project **Coconut** for two main reasons: Just because I can and because I like coconuts.
+
+Creating new cargo project:
 ```shell
 $ cargo new coconut
 ```
-We've just created a new project. It shoud have the following content:
+
+It should have the following content:
 
 ```shell
 $ tree coconut
@@ -78,13 +89,114 @@ lrlex = "0.13.1"
 lrpar = "0.13.1"
 ```
 
-This should have all the depenendencies we need.
+Now we have all the dependencies we need.
 
-## Setting up build.rs
+## Lexer 
 
-We need to compile our grammar (.l file) and lexer (.y).
-Next, we're going to craete `build.rs` for that:
+First we need to define the vocabulary we will use in our interpreter. For that, we'll create a `coconut.l` file in our `src` directory and define our keywords as key-value pairs, where the key is a normal Regex expression and the value is the formal **Lexeme** assigned to it, separated by whitespace.
 
+```%%
+[0-9]+ "INTEGER"
+\+ "ADD"
+\* "MUL"
+\( "LPAR"
+\) "RPAR"
+[\t\n ]+ ;
+```
+
+Let's examine it line-by-line:
+
+`[0-9]+ "INTEGER"`- Any string that will match the numeric sequence `0-9` will be identified as an `INTEGER` **Lexeme**. 
+
+`\+ "ADD"` - "+" characters will be identified as an `ADD` **Lexeme**.
+
+`\* "MUL"` - "*" characters will be identified as a `MUL` **Lexeme**.
+
+`\( "LPAR"` - "(" characters will be identified as an `LPAR` **Lexeme**.
+
+`\) "RPAR"` - ")" characters will be identified as an `RPAR` **Lexeme**.
+
+`[\t\n ]+ ;` - Any tabs, new lines and whitespaces will be replaced with empty strings. i.e. removed.
+
+That should give you a general idea of what is possible. We can define any Regex and assign a formal lexeme to it that will be later used in the **Parser** if a text sequence is matched by the Regex pattern.
+
+
+## Parser
+
+Defining the **Parser** will involve creating `coconut.y` in our `src` directory with the following content:
+```
+%start Expr
+%%
+
+Expr -> Result<u64, ()>:
+      Expr 'ADD' Term { Ok($1? + $3?) }
+    | Term { $1 }
+    ;
+
+Term -> Result<u64, ()>:
+      Term 'MUL' Factor { Ok($1? * $3?) }
+    | Factor { $1 }
+    ;
+
+Factor -> Result<u64, ()>:
+      'LPAR' Expr 'RPAR' { $2 }
+    | 'INTEGER'
+      {
+          let v = $1.map_err(|_| ())?;
+          parse_int($lexer.span_str(v.span()))
+      }
+    ;
+%%
+
+fn parse_int(s: &str) -> Result<u64, ()> {
+    match s.parse::<u64>() {
+        Ok(val) => Ok(val),
+        Err(_) => Err(())
+    }
+}
+```
+
+The `coconut.y` grammar file has three parts, separated by the `%%` lines.
+
+### General settings - 1st Part
+This is the part where general settings are set. At a minimum, it needs the start rule `%start` to know what rule should be the starting point for the Parser.
+
+### YACC Grammar rules - 2nd part
+
+Our example consists of three rules: `Expr`, `Term`, and `Factor` and six productions, also known as alternatives.
+
+Each rule can have multiple productions. Each production is separated by `|` character. Rules end with `;` a symbol.
+
+Productions can reference other rules or **Lexemes** defined in the `coconut.l` file. If the production pattern matches, its action code is executed. 
+
+Action code is set between `{` and `}` symbols.
+
+The `$x` variables refer to the respective **Lexeme** in the production. 
+
+For example:
+
+`Term { $1 }` references the first `$1` symbol.
+
+while 
+
+`'Expr 'ADD' Term { Ok($1? + $3?) }` rule will reference the first `$1` and the third `$3` symbols.
+
+### Rust code - 3rd part
+
+Any Rust code that can be called by production action code can be defined here. We can also import other rust code from the crate or external crates.
+
+In our example, that's where we defined the `parse_int` function.
+
+And there we have it! We went through the `grmtools` Quickstart example and defined our **Lexer** and **Parser**. 
+
+Next, we'll wire up our application!
+
+## Compiling our Parser to Rust
+
+In order to use the grammar we just defined, we need to compile it into Rust code.
+For that, we will create a `build.rs` file that will provide us with such functionality.
+
+Create `build.rs` file in the root of the project with the following content:
 ```
 use cfgrammar::yacc::YaccKind;
 use lrlex::CTLexerBuilder;
@@ -105,58 +217,13 @@ fn main() {
 }
 ```
 
-## Defining our lexer 
-
-Let's define the token we'll be using in our interpreter. 
-For that we'll create `coconut.l` in our `src` directory:
-
-```%%
-[0-9]+ "INTEGER"
-\+ "ADD"
-\* "MUL"
-\( "LPAR"
-\) "RPAR"
-[\t\n ]+ ;
-```
-
-Each line here is a set of two components - regex and the token id, separated by white space.
-
-Examples:
-`[0-9]+ "INT"`- any string that will match any numeric sequence `0-9` will be identified as "INTEGER" token. 
-
-`[\t\n ]+ ;` - any tabs, new lines and whitesapces will be replaces with empty string.
-
-
-## Defining our Grammer
-
-Defining the parser will involve createing `coconut.y` in our `src` directory with the following content:
-```
-```
-
-### Grammer Parts
-
-The grammar is in 3 parts, separated by the %% lines.
-
-1st Part - grammar settings, at a minimum the start rule (%start ...)
-
-2nd Part - Yacc grammar. 
-
-In our example, it consists of 3 rules: `Expr`, `Term`, and `Factor` and 6 productions (aka alternatives).
-Each rule can have multiple productions, separated by `|` characters.
-
-
-Pruduction symbols either reference other rules or lexemes (defined in `.l` file). 
-If production pattern matched, its action code is executed.
-
-
-The `$x` variables refer to the respective symbol in the production, numbered from 1 (i.e. $1 refers to the first symbol in the production).
-
-3rd Part - Rust code which can be called by productions actions. We can set anything here.
+If you're unfamiliar with `build.rs` see more information in the [The Cargo Book](https://doc.rust-lang.org/cargo/reference/build-scripts.html) [4]
 
 ## Application entry point
 
-Our application parts are comming together but we don't have the main entrypoint yet. 
-Let's defined our `main.rs` in `src` directory:
+We did the Lexing, Parsing and Compilation steps. Here we will hook all of it to our application entry point - `marin.rs`.
+
+Our `main.rs` content:
 
 ```rust
 use std::env;
@@ -164,21 +231,16 @@ use std::env;
 use lrlex::lrlex_mod;
 use lrpar::lrpar_mod;
 
-// brings the lexer for `calc.l` into scope. By default the module name will be `calc_l`
-lrlex_mod!("coconut.l");
-// brings the parser for `calc.y` into scope. By default the module name will be `calc_y`
-lrpar_mod!("coconut.y");
+lrlex_mod!("coconut.l"); // brings the lexer for `coconut.l` into scope.
+lrpar_mod!("coconut.y"); // brings the Parser for `coconut.y` into scope.
 
 fn main() {
     let args: Vec<String> = env::args().collect();
     if args.len() > 1 {
-        let input = &args[1];
-        // Create a lexer
-        let lexer_def = coconut_l::lexerdef();
-        // Lex the input.
+        let input = &args[1]; // Create a lexer
+        let lexer_def = coconut_l::lexerdef(); // Lex the input.
         let lexer = lexer_def.lexer(&input);
-        // Parse the input.
-        let (res, errs) = coconut_y::parse(&lexer);
+        let (res, errs) = coconut_y::parse(&lexer); // Parse the input.
         // Check for errors
         for e in errs {
             println!("{}", e.pp(&lexer, &coconut_y::token_epp));
@@ -192,47 +254,54 @@ fn main() {
         println!("Please provide at least one cli argument!")
     }
 }
-
 ```
 
-## Running our app
+In this code, we're accepting a single CLI argument as input, **Lexing** it, **Parsing** it and checking for errors.
 
-Try added two numbers:
+And we're kind of done!
+
+## Running our interpreter
+
+Try adding two numbers:
 
 ```shell
 $ cargo -q run '2+2'
 4
 ```
-`-q` flag tells cargo to be quiet and not output verbose debugging information.
+> `-q` flag tells cargo to be quiet and not output verbose information.
 
-Pretty cool I would say.
 
-But it also support operation precedence and more complex math expressions:
+Our interpreter also supports operation precedence and more complex math expressions:
 
 ```
 $ cargo -q run '2+2*2+(2+2)'
 10
 ```
 
-If you're not implressed its ok.
-the point is that if not careful, this expression can be avaluated as:
+If you're not impressed, it's OK. But there is something impressive going on here that we might have taken for granted.
 
-`1+2*3 = (1+2)*3 = 9` which is obviously wrong, at leasy by the conventional definition of `+` and `*` math operation. We know that `1+2*3` should be evaluated as `1+(2*3) = 7`/
+If we're not careful, `1+2*3` math expression can be evaluated as: `1+2*3 = (1+2)*3 = 9`. Which is obviously wrong, at least by the conventional definition of `+` and `*` math operations. We know that `1+2*3` should be evaluated as `1+(2*3) = 7`.
 
-We're not going to talk about how and why it worked, assume its some lind of magic behind the scenes. But it its todo with the fact that we just wrote an LR compatible parser. Writing our grammar in this odd way forces the "correct" parsing and operations precedence. It important mainly for arithmetic operations
-
-See https://tratt.net/laurie/blog/2020/which_parsing_approach.html for more details.
-
-
+We won't dive into how and why it worked; assume some magic is happening behind the scenes. 
+But if you're curious, it is something to do with the fact that we just wrote an **LR** parser. Writing our grammar in this way forces the "correct" parsing with "correct" operation precedence. It essential mainly for arithmetic operations. Read more about it [here](https://tratt.net/laurie/blog/2020/which_parsing_approach.html) [5].
 
 
 # Summary
 
-In this article we went through the steps of implementing your own interpreter using Rust programming langugage. 
-We went throught the quickstart of grmtools and talked the steps in diffrent words.
+We went through the steps of implementing our own interpreter using Rust programming language and `grmtools` `cfgrammar`, `lrlex` and `lrpar` libraries.
+We went through the quickstart of `grmtools` [1] and added a bit more explanations of the terminology used.
 
-
-This write-up was for my own sake of understanding and the organisation of my thoughts as it was about knowledge sharing. 
+This writing was for my own sake of understanding and the organisation of my thoughts as it was about knowledge sharing. 
 
 
 # References
+
+[1] https://softdevteam.github.io/grmtools/master/book/quickstart.html
+
+[2] https://www.geeksforgeeks.org/introduction-to-yacc/
+
+[3] https://en.wikipedia.org/wiki/Backus%E2%80%93Naur_form
+
+[4] https://doc.rust-lang.org/cargo/reference/build-scripts.html
+
+[5] https://tratt.net/laurie/blog/2020/which_parsing_approach.html
