@@ -291,6 +291,8 @@ But if you're curious, it is something to do with the fact that we just wrote an
 We went through the steps of implementing our own interpreter using Rust programming language and `grmtools` `cfgrammar`, `lrlex` and `lrpar` libraries.
 We went through the quickstart of `grmtools` [1] and added a bit more explanations of the terminology used.
 
+Illustrated Rust project example can be found [here](https://github.com/Pavel-Durov/blog/tree/main/src/writing-interpreter-with-rust).
+
 This writing was for my own sake of understanding and the organisation of my thoughts as it was about knowledge sharing. 
 
 
