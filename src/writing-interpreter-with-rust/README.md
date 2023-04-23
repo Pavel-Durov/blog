@@ -1,4 +1,4 @@
-# Writing interpreter in Rust using grmtools.
+# Writing interpreter in Rust using grmtools
 
 ## Introduction
 
@@ -95,7 +95,8 @@ Now we have all the dependencies we need.
 
 First we need to define the vocabulary we will use in our interpreter. For that, we'll create a `coconut.l` file in our `src` directory and define our keywords as key-value pairs, where the key is a normal Regex expression and the value is the formal **Lexeme** assigned to it, separated by whitespace.
 
-```%%
+```
+%%
 [0-9]+ "INTEGER"
 \+ "ADD"
 \* "MUL"
@@ -118,7 +119,7 @@ Let's examine it line-by-line:
 
 `[\t\n ]+ ;` - Any tabs, new lines and whitespaces will be replaced with empty strings. i.e. removed.
 
-That should give you a general idea of what is possible. We can define any Regex and assign a formal lexeme to it that will be later used in the **Parser** if a text sequence is matched by the Regex pattern.
+That should give you a general idea of what is possible. We can define any Regex and assign a formal lexeme to it that will be later used in the **Parser** if the Regex pattern matches a text sequence.
 
 
 ## Parser
@@ -179,11 +180,11 @@ For example:
 
 while 
 
-`'Expr 'ADD' Term { Ok($1? + $3?) }` rule will reference the first `$1` and the third `$3` symbols.
+`Expr 'ADD' Term { Ok($1? + $3?) }` rule references the first `$1` and the third `$3` symbols.
 
 ### Rust code - 3rd part
 
-Any Rust code that can be called by production action code can be defined here. We can also import other rust code from the crate or external crates.
+Any Rust code called by production action code can be defined here. We can also import other rust code from the crate or external crates.
 
 In our example, that's where we defined the `parse_int` function.
 
@@ -194,10 +195,10 @@ Next, we'll wire up our application!
 ## Compiling our Parser to Rust
 
 In order to use the grammar we just defined, we need to compile it into Rust code.
-For that, we will create a `build.rs` file that will provide us with such functionality.
+For that, we will create a `build.rs` file, which will provide us with such functionality.
 
-Create `build.rs` file in the root of the project with the following content:
-```
+Let's create `build.rs` file in the root of the project with the following content:
+```rust
 use cfgrammar::yacc::YaccKind;
 use lrlex::CTLexerBuilder;
 
@@ -221,7 +222,7 @@ If you're unfamiliar with `build.rs` see more information in the [The Cargo Book
 
 ## Application entry point
 
-We did the Lexing, Parsing and Compilation steps. Here we will hook all of it to our application entry point - `marin.rs`.
+We did the Lexing, Parsing and Compilation steps. Here we will hook all of it to our application entry point - `main.rs`.
 
 Our `main.rs` content:
 
@@ -256,7 +257,7 @@ fn main() {
 }
 ```
 
-In this code, we're accepting a single CLI argument as input, **Lexing** it, **Parsing** it and checking for errors.
+In this code, we accept a single CLI argument as input, **Lexing** it, **Parsing** it and checking for errors.
 
 And we're kind of done!
 
@@ -283,15 +284,15 @@ If you're not impressed, it's OK. But there is something impressive going on her
 If we're not careful, `1+2*3` math expression can be evaluated as: `1+2*3 = (1+2)*3 = 9`. Which is obviously wrong, at least by the conventional definition of `+` and `*` math operations. We know that `1+2*3` should be evaluated as `1+(2*3) = 7`.
 
 We won't dive into how and why it worked; assume some magic is happening behind the scenes. 
-But if you're curious, it is something to do with the fact that we just wrote an **LR** parser. Writing our grammar in this way forces the "correct" parsing with "correct" operation precedence. It essential mainly for arithmetic operations. Read more about it [here](https://tratt.net/laurie/blog/2020/which_parsing_approach.html) [5].
+But if you're curious, it is something to do with the fact that we just wrote an **LR** parser. Writing our grammar this way forces the "correct" parsing with "correct" operation precedence. It is essential mainly for arithmetic operations. Read more about it [here](https://tratt.net/laurie/blog/2020/which_parsing_approach.html) [5].
 
 
 # Summary
 
-We went through the steps of implementing our own interpreter using Rust programming language and `grmtools` `cfgrammar`, `lrlex` and `lrpar` libraries.
+We went through the steps of implementing our own interpreter using Rust programming language and `grmtools`: `cfgrammar`, `lrlex` and `lrpar` libraries.
 We went through the quickstart of `grmtools` [1] and added a bit more explanations of the terminology used.
 
-Illustrated Rust project example can be found [here](https://github.com/Pavel-Durov/blog/tree/main/src/writing-interpreter-with-rust).
+Rust project example can be found [here](https://github.com/Pavel-Durov/blog/tree/main/src/writing-interpreter-with-rust).
 
 This writing was for my own sake of understanding and the organisation of my thoughts as it was about knowledge sharing. 
 
