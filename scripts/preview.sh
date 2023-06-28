@@ -5,12 +5,12 @@ do
     echo " "
 done
 
-FONT="NV Script"
+FONT="Banner4"
 THEME="Dark+"
 
-ascii-themes generate --font="${FONT}" --themeName=${THEME} --text="Programming"
-ascii-themes generate --font="${FONT}" --themeName=${THEME} --text="Languages"
-ascii-themes generate --font="${FONT}" --themeName=${THEME} --text="Composition"
+ascii-themes generate --font="${FONT}" --themeName=${THEME} --text="   Loops"
+ascii-themes generate --font="${FONT}" --themeName=${THEME} --text="   and"
+ascii-themes generate --font="${FONT}" --themeName=${THEME} --text="   Opcodes   in   Lua"
 
 # echo ""
 # echo ""
