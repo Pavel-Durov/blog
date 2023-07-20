@@ -1,4 +1,4 @@
-# Consistent Hash Ring
+# Consistent Hashing
 
 ## Abstract
 
@@ -7,22 +7,26 @@ There will be no code, just a few diagrams and explanations.
 
 # Introduction
 
-...
-In distributed applications, we can scale vertically by adding more resources to a machine instance or horizontally - by adding more machines.
+In distributed applications, we are dealing with multiple machines that communicate with each other over a network.
+When we have an increased load on our system, we need to add more computing power to it so generally we have two options:
+1. Scale vertically - adding more resources to a machine instance
+2. Scale Horizontally - by adding more machines.
 
-Generally, horizontal scaling is preferred since there are fewer physical limitations when compared to vertical scaling. But Horizontal Scaling comes with its challanges.
+Sometimes one scaling technique is preffered over the other. But generally, horizontal scaling has fewer physical limitations when compared to vertical scaling. Theoretically, we can always add more machines to our system. While with Vertical scaling we cant add more CPU cores that are available by the latest CPU manufacturer. Horizontal Scaling comes with its challanges.
 
-Consistant Hashing is a common technique to achieve this goal.
+Consistent Hashing is a technique helping deal with Horizontally scalable systems while having minimal impact when machines are added or removed from the system.
 
 ## The Problem
 
-Let's say we have `n` db servers, i.e server pool of size `n`.
+Let's say we have `n` servers in our system i.e. server pool of size `n`.
+
 How can we distribute evenly the load of incoming requests between them?
 
-One way to do so is to use some kind of hash method like:
+A straight-forward approach would be to use some kind of hash method like:
 ```
 server = hash(key) % n
 ```
+Given a key, we ca hash it, and then using mod operation we can identify which server it belongs to.
 
 Sounds easy enough.
 
