@@ -38,3 +38,4 @@ compile_commands.json
 CTestTestfile.cmake
 _deps
 build/**
+pypy3.10-v7.3.12-linux64
