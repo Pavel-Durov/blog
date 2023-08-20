@@ -1,10 +1,11 @@
 # Developer Experience and SDKs
 
-
 ## Introduction
 
+Software Development Kits (SDKs) provide a means for achieving smooth integration with external systems, whether they involve remote APIs, domain-specific functionalities, or tasks related to operating systems. SDKs facilitate the process of integration by providing consistent API (Application Programming Interface) and abstraction levels to the underlying functionality.
 
 ## What's SDK
+
 An SDK (Software Development Kit) is a collection of software components bundled as a package. 
 This package encompasses everything necessary to effectively use the underlying system for which the SDK provides functionality.
 
@@ -59,9 +60,13 @@ When tailored to a specific programming language, it should faithfully stick to 
 
 The end-to-end use of the tool should be easy. That includes installation, configuration and actual use.
 
-### Adaptable
+### Adaptability
 
 It should be designed to be flexible. That includes modularity, configuration options and version management.
+
+### Compatibility
+
+To achieve good DX software needs to be designed with compatibility in mind. The worse DX is when you upgrade your SDK version and suddenly you need to fix all the places that this SDK is used in your project. We will talk more extensively about compatibility types and examples later on. 
 
 ### Quickstarts and Samples
 
@@ -126,9 +131,9 @@ Let's call it V1.
 Let's talk about optional parameters and how they affect code evolution over time.
 
 
-Consider our SDK `createPost`` function:
+Consider our SDK `createPost` function:
 ```ts
-function createPost(title: string, content: string): Post {
+function createPost(title: string, content: string): Promise<Post> {
   //....
 }
 ```
@@ -137,7 +142,7 @@ Let's say we want to allow multiple ways of creating Post objects.
 And the obvious tool of choice for this job is, you guessed it right - optional parameters.
 
 ```ts
-function createPost(title: string, content: string, subtitle?: string){
+function createPost(title: string, content: string, subtitle?: string): Promise<Post> {
   //....
 }
 ```
@@ -155,102 +160,120 @@ createPost("My Title", "My Content", "My Subtitle");
 
 It's already morphing into something weird. 
 
-Intuitively I would expect the title to be the first function argument, followed by the subtitle and then the content.
-But we can't just change the order at will, we will be breaking V1 version where suddenly all the content will be set as subtitles - that is unacceptable.
-
+Intuitively I would expect the title to be the first function argument, followed by the subtitle and then the content. But we can't just change the order at will, we will be breaking V1 compatibility. If we did it will mean that for V1 suddenly all the content will be set as subtitles - that is unacceptable.
 
 And what will happen when we add another parameter to our function?
 
-TODO: next
-
 ```js
-function newPost(title: string, content?: string, callback?: string, date?: Date){
-  //....
-}
+function createPost(title: string, content: string, subtitle?: string, date?: Date): Promise<Post>{ /* ... */ }
 ```
 Now this function can be used as:
 
 ```js
-newPost("My Title")
-newPost("My Title", "My Content")
-newPost("My Title", "My Content", (data) => console.log(data));
-newPost("My Title", "My Content", (data) => console.log(data), new Date());
-newPost("My Title", undefined, (data) => console.log(data), new Date());
-newPost("My Title", undefined, undefined, new Date());
-// etc...
+createPost("My Title", "My Content");
+createPost("My Title", "My Content", "My Subtitle", new Date());
 ```
-I'm not going to list all the permutations here, but I think the idea is clear.
+But also as:
+```js
+createPost("My Title", "My Content", undefined, new Date());
+```
+Which is also not great. Looking at the code, it's hard to understand what is set as `undefined`.
 
-What would be better?
+So, what would be better to use in this case?
+
 We can use an object for that!
 
-```js
+```ts
 interface Params {
   title: string;
+  subtitle?: function;
   content?: string;
-  callback?: function;
   date?: Date;
 }
-
-function newPost(params: Params) : Promise<number>{
-  return Promise.resolve(0);
-}
+function createPost(params: Params) : Promise<number> { /* ... */ }
 
 ```
-and with js:
-```js
-/**
- * @function newPost
- * @param {Object} params Post creation params
- * @param {string} params.title Post title
- * @param {string} params.content Post content
- * @param {function} params.callback Post update callback
- * @param {Date} params.date Post creation date
- * @returns {Promise<number>} Created Post ID
- */
-function newPost(params){
-  return Promise.resolve(0);
-}
+
+And we can use it as:
+
+```ts
+await createPost({
+  title: "My Title", , 
+  content: "My Content", 
+});
+await createPost({
+  title: "My Title",
+  subtitle: "My Subtitle",
+  content: "My Content", 
+});
+await createPost({
+  title: "My Title", 
+  subtitle: "My Subtitle", 
+  content: "My Content", 
+  date: new Date()
+});
 ```
 
-# Compatibility
+Which is more readable, has no specific parameter ordering, and most importantly, no breaking changes.
+It's easier to evolve the functionality based on types rather than function parameter orders.
 
-## Backward
+Next, we'll overview compatibility which is also a very important topic when it comes to maintaining and evolving software over time.
 
-Consumers of the new version (V+1) can use previous version (V).
+# Version Compatibility
+
+Compatibility in software SDKs refers to the ability of the SDK to work seamlessly with other versions of that software without causing errors. 
+There are different compatibilities.
+
+In all of the examples bellow we will refer to the same  `createPost` function:
+```ts
+// V1
+function createPost(title: string, content: string): Promise<Post> { /* EMPTY */ }
+// V2
+function createPost(title: string, content: string, subtitle?: string): Promise<Post>  { /* EMPTY */ }
+```
+
+## Backward Compatibility
+
+Consumers of the new version V+1 can use the previous version V.
 
 Analogy: 
+USB 3.0 devices are expected to work with USB 2.0 ports
 
-We expect USB 3.0 devices to work with USB 2.0 ports
+Our V2 is backward compatible as existing V1 code that calls with only two arguments will still work with the V2 function.
 
+```ts
+await createPost("My Title", "My Content", "Subtitle");
+```
 
-HDMI 10.0 was designed in a way so that clients (TVs) would be able to connect to old 9.0 producers (streaming devices).
+## Forward Compatibility
 
-## Forward
-Consumers of old versions (V) can use version (V+1).
+Consumers of old version V can use version V+1.
+Forward compatibility ensures that the code can evolve along with the environment it operates in. 
 
 Analogy:
 We expect USB 2.0 devices to work with USB 3.0 ports
 
-Forward compatibility is hard. Supporting it means that the design was built with future revolution in mind.
+It might be confusing, but our function is actually NOT forward-compatible.
+Old version V cannot use V2 features of adding subtitles as part of post-creation. To make it compatible, we should've shipped V1 with an optional subtitle parameter that would be used in the future. That's what makes it so difficult - thinking about possible future extensions.
 
-## Full
+## Full Compatibility
 
-It's hard, but its doable!
+That's really hard, but it's doable! 
+
 With full compatibility, we have the best of both worlds. Users of V+1 version can use V version, and users of V version can use V+1 version.
 
-Most of the time we talk bout backward compatibility, as when we have newer versions of something we exepect it to work with previous versions. But we also expect older versions to work with newer, so most of the time we actually speaking of full compatibility.
+Most of the time we talk bout backward compatibility, as when we have newer versions of something we naturally expect it to work with previous versions. 
+But we also expect older versions to work with newer ones, so most of the time we actually speaking of full compatibility.
 
 
-## Other things to consider:
-Semantic Versioning (SemVer), Changelog, LTS (Long-Term Support)
 ## Summary
 
+We talked about SDKs and their use. 
+We mentioned the importnece of good DX and what is good DX looks like.
+We talked about different types of functionality - backward, forwards and full.
+And we provided practical examples with typescript functions.
 We need Node.js SDKs to be intuitive
 
-Simple
-Intuitive
-Easy to use and clear documentation
-Needs to be Adaptive
-Be forward and backwards compatible
+Other things to consider:
+Semantic Versioning (SemVer), Changelog, LTS (Long-Term Support)
 
