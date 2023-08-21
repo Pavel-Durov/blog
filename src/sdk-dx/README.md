@@ -1,12 +1,17 @@
 # Developer Experience and SDKs
+## Abstract.
+
+This article overviews the realm of SDKs (Software Development Kit), discussing their benefits and core attributes. Through the exploration of TypeScript examples, we will also delve into the concepts of DX (Developer Experience) and various types of compatibility.
+
 
 ## Introduction
+SDK provides a means of integration with external systems such as remote APIs, operating systems, devices or hardware platforms. 
 
-Software Development Kits (SDKs) provide a means for achieving smooth integration with external systems, whether they involve remote APIs, domain-specific functionalities, or tasks related to operating systems. SDKs facilitate the process of integration by providing consistent API (Application Programming Interface) and abstraction levels to the underlying functionality.
+By establishing consistent APIs and abstraction layers, SDKs simplify the integration process, providing a structured means to interact with underlying functionalities. SDKs facilitate the process of integration by providing consistent API (Application Programming Interface) and abstraction levels to the underlying functionality.
 
 ## What's SDK
 
-An SDK (Software Development Kit) is a collection of software components bundled as a package. 
+An SDK is a collection of software components bundled as a package. 
 This package encompasses everything necessary to effectively use the underlying system for which the SDK provides functionality.
 
 Examples of SDKs:
@@ -38,7 +43,7 @@ If we have an easy-to-use tool it will be naturally adopted by individuals or co
 ### Explicit Functionality
 
 
-While this principle may appear elementry, it's essential. 
+While this principle may appear elementary, it's essential. 
 A tool should precisely do what it claims to do. Surprisingly, numerous tools have an inclination to do things that a developer would not reasonably anticipate.
 
 Consider this scenario: you've incorporated an SDK to seamlessly interface with a Restful API. Yet, upon implementation in your project, it unexpectedly generates hefty files on your disk due to an unanticipated optimisation process.
@@ -48,11 +53,7 @@ Consider this scenario: you've incorporated an SDK to seamlessly interface with 
 Documentation does not need not be verbose, it should be precise. Crafting clear documentation is one of the most challenging parts in software engineering. 
 It is imperative for documentation to remain up-to-date, striking a balance between brevity and comprehensiveness.
 
-### Ease of use
-
-Overall it needs to be intuitive. A developer can look at the code and can understand what to do with it without deep dive into the documentation. If it's language-specific then it needs to follow the language standards and not reinvent the wheel. It should look familiar and friendly.
-
-### Ease of use
+### Intuitive and easy to use
 
 It should be intuitive. A developer should glance at the code and immediately get how to work with it without the need for extensive documentation exploration. 
 
@@ -89,22 +90,24 @@ app.listen(port, () => {
 
 In just 11 lines, we can get a server up and running. The first time I've seen it I was blown away.
 
-## Dx with node.js SDKs
+## TypeSCript Node.js SDKs
 
-Now, let's talk about a specific SDK implementation in TypeScript.
+Now, let's talk about TypeScript SDK specifics.
 
-In order to deliver a good DX, we need first to understand the client. What TypeScript engineers expect from the SDK.
+To deliver a good experience, we need first to understand the client. 
+We need to ask - What do TypeScript engineers expect from the SDK?
 
-Usually:
+To name a few of these expectations:
+- Easy-to-use SDK
 - Promises and Async/Await
-- Easy to use SDK
-- Installed with one of the goto package managers like `npm``
+- Installed with one of the goto package managers like `npm`
 - It should have functional code examples - copy, paste, execute.
-- Type Definitions - TypeScript is statically-typed language, types are the basic components.
+- Type Definitions - TypeScript is a statically-typed language, and types are the basic components.
 - Type Safety - SDKs should enforce type safety throughout their interfaces.
-- Modules Support - compatibility with modern module systems like CommonJS and ES6 modules
-- Optional parameters - Optional parameters enhance flexibility and usability.
+- Modules Support - Compatibility with modern module systems like CommonJS and ES6 modules
+- Optional parameters - Optional parameters enhance the flexibility and usability of the SDK.
 
+We're going to address most of these points, with a focus on code evolution and optional parameters.
 
 ## Example
 
@@ -219,7 +222,7 @@ It's easier to evolve the functionality based on types rather than function para
 
 Next, we'll overview compatibility which is also a very important topic when it comes to maintaining and evolving software over time.
 
-# Version Compatibility
+# Compatibility
 
 Compatibility in software SDKs refers to the ability of the SDK to work seamlessly with other versions of that software without causing errors. 
 There are different compatibilities.
@@ -265,15 +268,10 @@ With full compatibility, we have the best of both worlds. Users of V+1 version c
 Most of the time we talk bout backward compatibility, as when we have newer versions of something we naturally expect it to work with previous versions. 
 But we also expect older versions to work with newer ones, so most of the time we actually speaking of full compatibility.
 
-
 ## Summary
 
-We talked about SDKs and their use. 
-We mentioned the importnece of good DX and what is good DX looks like.
-We talked about different types of functionality - backward, forwards and full.
-And we provided practical examples with typescript functions.
-We need Node.js SDKs to be intuitive
+We explored the realm of SDKs and their applications. We delved into the significance of a good DX. Additionally, we examined various compatibility types, including backward, forward, and full compatibility, accompanied by practical TypeScript examples.
 
-Other things to consider:
-Semantic Versioning (SemVer), Changelog, LTS (Long-Term Support)
+This article was written for my own sake of understanding and the organisation of my thoughts as it was about knowledge sharing. 
 
+I trust that it proved valuable!
