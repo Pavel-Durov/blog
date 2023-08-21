@@ -1,43 +1,39 @@
 # Developer Experience and SDKs
 ## Abstract.
 
-This article overviews the realm of SDKs (Software Development Kit), discussing their benefits and core attributes. Through the exploration of TypeScript examples, we will also delve into the concepts of DX (Developer Experience) and various types of compatibility.
+This article overviews the realm of SDKs (Software Development Kit), discussing their benefits and core attributes. Through the exploration of TypeScript examples, we will introduce the concepts of DX (Developer Experience) and various types of compatibility.
 
 
 ## Introduction
-SDK provides a means of integration with external systems such as remote APIs, operating systems, devices or hardware platforms. 
 
-By establishing consistent APIs and abstraction layers, SDKs simplify the integration process, providing a structured means to interact with underlying functionalities. SDKs facilitate the process of integration by providing consistent API (Application Programming Interface) and abstraction levels to the underlying functionality.
-
-## What's SDK
-
-An SDK is a collection of software components bundled as a package. 
-This package encompasses everything necessary to effectively use the underlying system for which the SDK provides functionality.
+SDK provides a means of integration with external systems such as remote APIs, operating systems, devices or hardware platforms. It is a collection of software components bundled as one package.
+This package contains everything necessary to effectively use the underlying system for which the SDK provides functionality.
 
 Examples of SDKs:
-Stripe SDK - https://stripe.com/docs/libraries
-Adobe Acrobat SDK - https://opensource.adobe.com/dc-acrobat-sdk-docs/acrobatsdk/
-Unity SDK - https://docs.unity.com/ads/en-us/manual/InstallingTheUnitySDK
+Stripe SDK
+Adobe Acrobat SDK
+Unity SDK
 
-## Advantages of utilizing SDKs
+But it’s not enough to have an SDK that is functional, if we want the SDK to be adopted and survive the test of time, it also needs to have a good user experience. This experience is called DX (Developer Experience) since developers are the users of these SDK.
+
+
+## SDK Advantages
 
 SDKs offer a streamlined approach to crafting applications for specific targets. They function as specialized toolkits. One of their key benefits lies in simplifying the integration process. This simplification is achieved by often hiding the complexities of internal implementation and providing an intuitive interface.
 
-## SDKs vs APIs
+## SDK vs API
 
-Usually, an API (Application Programming Interface) is contained within an SDK. SDKs employ APIs in the background, enhancing them with additional functionality, comprehensive documentation, and practical examples.
+Usually, an API (Application Programming Interface) is contained within an SDK. SDKs use some sort of APIs behind the scenes, enhancing it with additional functionality, comprehensive documentation, and practical examples.
 
-Distinctively, SDKs are tailored to specific programming languages, while APIs maintain a higher level of abstraction. This distinction makes SDKs more user-friendly and readily adoptable due to their streamlined integration and developer experience.
+Distinctively, SDKs are tailored to specific programming languages, while APIs maintain a higher level of abstraction and usually language-agnostic. This distinction makes SDKs more user-friendly and readily adoptable due to their streamlined integration and developer experience.
 
 
 ## What's DX and why it's important
 
-DX (Developer Experience) describes the interactions and feelings that a software developer has when working with a tool or piece of code. 
+DX (Developer Experience) describes the interactions and experience that a software developer has when working with a tool or a piece of code. 
 If you are familiar with the term UX (User Experience), then you can think of DX in the same terms where the user is the developer.
-
-It might be subjective, but great DX is hard to deny. Generally speaking, when evaluating tools we should consider:
-
-If we have an easy-to-use tool it will be naturally adopted by individuals or communities, if it feels good to people, they will naturally talk about it. Good DX improves productivity and the adoption tools.
+It might be subjective, but great DX is hard to deny. 
+Generally speaking, when evaluating DX we should consider multiple factors.
 
 
 ### Explicit Functionality
@@ -90,24 +86,22 @@ app.listen(port, () => {
 
 In just 11 lines, we can get a server up and running. The first time I've seen it I was blown away.
 
-## TypeSCript Node.js SDKs
+## Node.js and TypeScript SDK
 
-Now, let's talk about TypeScript SDK specifics.
-
-To deliver a good experience, we need first to understand the client. 
-We need to ask - What do TypeScript engineers expect from the SDK?
+Let's talk about TypeScript SDK specifics. To deliver a good DX we need first to understand the client.
+We need to ask - What do TypeScript engineers expect from the SDK?
 
 To name a few of these expectations:
 - Easy-to-use SDK
 - Promises and Async/Await
-- Installed with one of the goto package managers like `npm`
-- It should have functional code examples - copy, paste, execute.
-- Type Definitions - TypeScript is a statically-typed language, and types are the basic components.
-- Type Safety - SDKs should enforce type safety throughout their interfaces.
-- Modules Support - Compatibility with modern module systems like CommonJS and ES6 modules
-- Optional parameters - Optional parameters enhance the flexibility and usability of the SDK.
+- Package manager support -  installation with one of the goto package managers like npm
+- Functional code examples - copy, paste, execute.
+- Type Definitions - TypeScript is a statically-typed language, and types are the basic components.
+- Type Safety -enforce type safety throughout their interfaces.
+- Modules Support - compatibility with modern module systems like CommonJS and ES6 modules
+- Optional parameters - Optional parameters enhance the flexibility and usability of the SDK.
 
-We're going to address most of these points, with a focus on code evolution and optional parameters.
+We're going to address most of these points, with a focus on optional parameter and scode evolution..
 
 ## Example
 
@@ -129,25 +123,23 @@ await posts.like(post.id);
 
 Let's call it V1.
 
-## The evolution of optional parameters
+## Optional parameters and code evolution
 
 Let's talk about optional parameters and how they affect code evolution over time.
 
 
 Consider our SDK `createPost` function:
 ```ts
-function createPost(title: string, content: string): Promise<Post> {
-  //....
-}
+function createPost(title: string, content: string): Promise<Post> { /* ... */}
 ```
 
-Let's say we want to allow multiple ways of creating Post objects.
-And the obvious tool of choice for this job is, you guessed it right - optional parameters.
+Let's say we want to allow multiple ways of creating Post objects. And the obvious tool of choice for this job is, you guessed it right - optional parameters.
+
+But we don't want to break the current usage of this function, we want to introduce new functionality while keeping the SDK compatible with previous versions.
+Here's how we can add new functionality:
 
 ```ts
-function createPost(title: string, content: string, subtitle?: string): Promise<Post> {
-  //....
-}
+function createPost(title: string, content: string, subtitle?: string): Promise<Post> { /* ... */}
 ```
 Now we can use it in both ways:
 
@@ -162,8 +154,7 @@ createPost("My Title", "My Content", "My Subtitle");
 ```
 
 It's already morphing into something weird. 
-
-Intuitively I would expect the title to be the first function argument, followed by the subtitle and then the content. But we can't just change the order at will, we will be breaking V1 compatibility. If we did it will mean that for V1 suddenly all the content will be set as subtitles - that is unacceptable.
+Intuitively I would expect the title to be the first function argument, followed by the subtitle and then the content. But we can't just change the order at will, we will be breaking V1 compatibility. If we did, it will mean that for V1 suddenly all the content will be set as subtitles - that is unacceptable.
 
 And what will happen when we add another parameter to our function?
 
@@ -225,9 +216,7 @@ Next, we'll overview compatibility which is also a very important topic when it 
 # Compatibility
 
 Compatibility in software SDKs refers to the ability of the SDK to work seamlessly with other versions of that software without causing errors. 
-There are different compatibilities.
-
-In all of the examples bellow we will refer to the same  `createPost` function:
+There are different types of compatibilities. In all of the examples bellow we will refer to the same `createPost` function:
 ```ts
 // V1
 function createPost(title: string, content: string): Promise<Post> { /* EMPTY */ }
@@ -242,19 +231,14 @@ Consumers of the new version V+1 can use the previous version V.
 Analogy: 
 USB 3.0 devices are expected to work with USB 2.0 ports
 
-Our V2 is backward compatible as existing V1 code that calls with only two arguments will still work with the V2 function.
-
-```ts
-await createPost("My Title", "My Content", "Subtitle");
-```
+Our V2 is backward compatible because existing V1 code that calls with only use two parameters will still work with the V2 changes.
 
 ## Forward Compatibility
 
-Consumers of old version V can use version V+1.
+Consumers of old version V can use new version V+1.
 Forward compatibility ensures that the code can evolve along with the environment it operates in. 
 
-Analogy:
-We expect USB 2.0 devices to work with USB 3.0 ports
+Analogy: We expect USB 2.0 devices to work with USB 2.0 ports. although they won't take advantage of USB 3.0 enhanced functionality.
 
 It might be confusing, but our function is actually NOT forward-compatible.
 Old version V cannot use V2 features of adding subtitles as part of post-creation. To make it compatible, we should've shipped V1 with an optional subtitle parameter that would be used in the future. That's what makes it so difficult - thinking about possible future extensions.
@@ -267,6 +251,7 @@ With full compatibility, we have the best of both worlds. Users of V+1 version c
 
 Most of the time we talk bout backward compatibility, as when we have newer versions of something we naturally expect it to work with previous versions. 
 But we also expect older versions to work with newer ones, so most of the time we actually speaking of full compatibility.
+If we shipped the V2 function as V1, we would have fully compatible software.
 
 ## Summary
 
