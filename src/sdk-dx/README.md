@@ -1,75 +1,65 @@
 # Developer Experience and SDKs
 ## Abstract.
 
-This article overviews the realm of SDKs (Software Development Kit), discussing their benefits and core attributes. Through the exploration of TypeScript examples, we will introduce the concepts of DX (Developer Experience) and various types of compatibility.
-
+This article delves into SDKs (Software Development Kit), covering their development, maintenance, and the crucial aspects of DX (Developer Experience). We'll explore DX core principles with TypeScript examples and examine code evolution and compatibility concerns.
 
 ## Introduction
 
-SDK provides a means of integration with external systems such as remote APIs, operating systems, devices or hardware platforms. It is a collection of software components bundled as one package.
+SDK provides a means of integration with external systems such as remote APIs (Application Programming Interface), local ABIs (Application Binary Interfce), devices or hardware platforms. It is a collection of software components bundled as one package.
 This package contains everything necessary to effectively use the underlying system for which the SDK provides functionality.
+But it's not enough to have an SDK that is functional, if we want the SDK to be adopted and survive the test of time, it also needs to have a good user experience. We call this experience DX since developers are the main users of SDKs.
 
-Examples of SDKs:
-Stripe SDK
-Adobe Acrobat SDK
-Unity SDK
+## Why build SDK?
 
-But it’s not enough to have an SDK that is functional, if we want the SDK to be adopted and survive the test of time, it also needs to have a good user experience. This experience is called DX (Developer Experience) since developers are the users of these SDK.
+SDKs offer a streamlined approach to crafting applications for specific targets. They function as specialised toolkits. One of their key benefits lies in simplifying the integration process. This simplification is achieved by often hiding the complexities of internal implementation and providing an intuitive interface.
 
-
-## SDK Advantages
-
-SDKs offer a streamlined approach to crafting applications for specific targets. They function as specialized toolkits. One of their key benefits lies in simplifying the integration process. This simplification is achieved by often hiding the complexities of internal implementation and providing an intuitive interface.
+Additionally, SDK is a reusable component. It allows seamless integration into multiple projects, reducing code duplication, and facilitating support and maintenance.
 
 ## SDK vs API
 
-Usually, an API (Application Programming Interface) is contained within an SDK. SDKs use some sort of APIs behind the scenes, enhancing it with additional functionality, comprehensive documentation, and practical examples.
+API (Application Programming Interface) expose the internal functionality of a system without exposing its internals in a language-agnostic fashion.
+Distinctively, SDKs are tailored to specific programming languages, while APIs maintain a higher level of abstraction. This distinction makes SDKs more user-friendly and readily adoptable due to their straightforward integration and developer experience.
+Usually, SDKs use some sort of API behind the scenes while enhancing it with additional functionality, comprehensive documentation, and practical examples.
 
-Distinctively, SDKs are tailored to specific programming languages, while APIs maintain a higher level of abstraction and usually language-agnostic. This distinction makes SDKs more user-friendly and readily adoptable due to their streamlined integration and developer experience.
 
-
-## What's DX and why it's important
+## DX
 
 DX (Developer Experience) describes the interactions and experience that a software developer has when working with a tool or a piece of code. 
 If you are familiar with the term UX (User Experience), then you can think of DX in the same terms where the user is the developer.
 It might be subjective, but great DX is hard to deny. 
-Generally speaking, when evaluating DX we should consider multiple factors.
+When evaluating DX we should consider multiple factors.
+
+### DX - Explicit functionality
 
 
-### Explicit Functionality
+While this principle may appear elementary, it's essential and sometimes overlooked.
+A tool should precisely do what it claims to do. Surprisingly, numerous tools are inclined to do things that a developer would not reasonably anticipate.
+Consider this scenario: You've integrated an SDK into your project inorder to use some kind of remote Restful API. Yet, upon its use, it unexpectedly generates hefty files on your disk due to an unexpected optimisation process that was never mentioned.
 
+### DX - Comprehensive documentation
 
-While this principle may appear elementary, it's essential. 
-A tool should precisely do what it claims to do. Surprisingly, numerous tools have an inclination to do things that a developer would not reasonably anticipate.
+Documentation does not need not be verbose, but it should be precise. Crafting clear documentation is one of the most challenging parts in software engineering. 
+It is crucial for documentation to remain up-to-date, striking a balance between brevity and comprehensiveness.
 
-Consider this scenario: you've incorporated an SDK to seamlessly interface with a Restful API. Yet, upon implementation in your project, it unexpectedly generates hefty files on your disk due to an unanticipated optimisation process.
+### DX - Intuitive and easy to use
 
-### Comprehensive documentation
+It should be intuitive. A developer should look at the code and immediately understand how to work with it without the need for extensive documentation exploration.
+When tailored to a specific programming language, it should faithfully stick to the language's conventions and avoid unnecessary deviations. The code's appearance should be familiar and approachable.
+The end-to-end use of the tool should be easy as well. That includes installation, configuration and actual use.
+### DX - Adaptability
 
-Documentation does not need not be verbose, it should be precise. Crafting clear documentation is one of the most challenging parts in software engineering. 
-It is imperative for documentation to remain up-to-date, striking a balance between brevity and comprehensiveness.
+It should be designed to be flexible and adaptable. That includes modularity, configuration options and version management.
+### DX - Compatibility
 
-### Intuitive and easy to use
+In order to achieve good DX, software needs to be designed with compatibility in mind.
+The worse DX is when you upgrade your SDK version and suddenly you need to fix all the places that it's used in the project.
+We will talk more extensively about compatibility types and examples later on.
 
-It should be intuitive. A developer should glance at the code and immediately get how to work with it without the need for extensive documentation exploration. 
+### DX - Quickstarts and Samples
 
-When tailored to a specific programming language, it should faithfully stick to the language's conventions and avoid unnecessary deviations. The code's appearance should invoke familiarity and approachability.
+Compact, functional examples that provide a comprehensive glimpse of the tool's capabilities are priceless. They trigger those "AHA" moments when, upon using the provided sample, everything effortlessly falls into place.
+One of the best quickstarts I've seen is is node.js express:
 
-The end-to-end use of the tool should be easy. That includes installation, configuration and actual use.
-
-### Adaptability
-
-It should be designed to be flexible. That includes modularity, configuration options and version management.
-
-### Compatibility
-
-To achieve good DX software needs to be designed with compatibility in mind. The worse DX is when you upgrade your SDK version and suddenly you need to fix all the places that this SDK is used in your project. We will talk more extensively about compatibility types and examples later on. 
-
-### Quickstarts and Samples
-
-Compact, functional examples that provide a comprehensive glimpse of the tool's capabilities are priceless. They trigger those illuminating "AHA" moments when, upon running the provided sample, everything effortlessly falls into place.
-
-One of the best quickstarts is node.js express - https://expressjs.com/en/starter/hello-world.html
 ```js
 const express = require('express')
 const app = express()
@@ -88,20 +78,20 @@ In just 11 lines, we can get a server up and running. The first time I've seen i
 
 ## Node.js and TypeScript SDK
 
-Let's talk about TypeScript SDK specifics. To deliver a good DX we need first to understand the client.
-We need to ask - What do TypeScript engineers expect from the SDK?
+Let's talk about TypeScript SDK specificly.
+To deliver a good DX we need first to understand the client. We need to ask - What do TypeScript engineers expect from the SDK?
 
 To name a few of these expectations:
-- Easy-to-use SDK
-- Promises and Async/Await
+- Easy-to-use
+- Promises and Async/Await - async functionality by default.
 - Package manager support -  installation with one of the goto package managers like npm
 - Functional code examples - copy, paste, execute.
-- Type Definitions - TypeScript is a statically-typed language, and types are the basic components.
-- Type Safety -enforce type safety throughout their interfaces.
+- Type Definitions -TypeScript is a statically-typed language, types are treated as a basic component.
+- Type Safety - type safety should be enforced throughout the interfaces.
 - Modules Support - compatibility with modern module systems like CommonJS and ES6 modules
 - Optional parameters - Optional parameters enhance the flexibility and usability of the SDK.
-
-We're going to address most of these points, with a focus on optional parameter and scode evolution..
+  
+In the following examples, we will try to address most of these points, with a focus on optional parameters and code evolution.
 
 ## Example
 
@@ -215,8 +205,10 @@ Next, we'll overview compatibility which is also a very important topic when it 
 
 # Compatibility
 
-Compatibility in software SDKs refers to the ability of the SDK to work seamlessly with other versions of that software without causing errors. 
-There are different types of compatibilities. In all of the examples bellow we will refer to the same `createPost` function:
+Compatibility in software refers to the ability of the software to work without integration errors with other versions of itself.
+As there are multiple possible versions of the SDK, there are different types of compatibility.
+In all of the examples bellow we will refer to the same V1 and V2 createPost function.
+
 ```ts
 // V1
 function createPost(title: string, content: string): Promise<Post> { /* EMPTY */ }
@@ -226,32 +218,34 @@ function createPost(title: string, content: string, subtitle?: string): Promise<
 
 ## Backward Compatibility
 
-Consumers of the new version V+1 can use the previous version V.
+Clients with  the new version V2 can use the previous version V1 interface.
+Our createPost V2 interface is backwards compatible because it can work seamlessly with code written for the V1 version.
 
-Analogy: 
-USB 3.0 devices are expected to work with USB 2.0 ports
+Analogy: USB 3.0 devices are expected to work with USB 2.0 ports
 
-Our V2 is backward compatible because existing V1 code that calls with only use two parameters will still work with the V2 changes.
+Time Traveling Analogy: Backwards compatibility in SDKs is like a time machine that allows you to take your future technology (represented by the new SDK) and use it in the past (represented by the older SDK) without issues.
 
 ## Forward Compatibility
 
-Consumers of old version V can use new version V+1.
-Forward compatibility ensures that the code can evolve along with the environment it operates in. 
+Clients with old version V1 can use the new V2 version interface.
+Forward compatibility ensures that the code can evolve along with the environment it operates in.
 
-Analogy: We expect USB 2.0 devices to work with USB 2.0 ports. although they won't take advantage of USB 3.0 enhanced functionality.
+It might be confusing but the createPost V1 interface is NOT forwards compatible with respect to V2. 
+A client with V1 SDK cannot use V2 interface, i.e. if I install V1 SDK in my project I cannot use the subtitle parameter.
 
-It might be confusing, but our function is actually NOT forward-compatible.
-Old version V cannot use V2 features of adding subtitles as part of post-creation. To make it compatible, we should've shipped V1 with an optional subtitle parameter that would be used in the future. That's what makes it so difficult - thinking about possible future extensions.
+Analogy: We expect USB 2.0 devices to work with USB 3.0 ports. Although they won't take advantage of USB 3.0 enhanced functionality.
+
+Time Traveling Analogy: It's like traveling into the future, where newer technologies and capabilities exist, while  interacting with them seamlessly, even though your current tools or systems are not as advanced.
 
 ## Full Compatibility
 
-That's really hard, but it's doable! 
+With full compatibility, we have the best of both worlds. Users of V2 version can use V1 version, and users of V1 version can use V2 version.
+Most of the time we talk bout backward compatibility, as when we have newer versions of something we naturally expect it to work with previous versions. 
+If we shipped the V2 function as V1, we would have fully compatible software. But its easier said than done.
 
-With full compatibility, we have the best of both worlds. Users of V+1 version can use V version, and users of V version can use V+1 version.
+Analogy: We expect USB 2.0 devices to work with USB 3.0 ports as well as USB 3.0 devices are expected to work with USB 2.0 ports
 
-Most of the time we talk bout backward compatibility, as when we have newer versions of something we naturally expect it to work with previous versions. 
-But we also expect older versions to work with newer ones, so most of the time we actually speaking of full compatibility.
-If we shipped the V2 function as V1, we would have fully compatible software.
+Time Traveling Analogy: Full compatibility in SDKs is like to having access to a time machine that allows you to travel to any point in time, interact with any technology or environment, and return to your own time without any difficulties.
 
 ## Summary
 
