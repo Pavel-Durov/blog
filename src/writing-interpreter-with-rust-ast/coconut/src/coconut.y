@@ -1,29 +1,53 @@
-%start Expr
+%start Nodes
+%avoid_insert "INTEGER"
 %%
 
-Expr -> Result<u64, ()>:
-      Expr 'ADD' Term { Ok($1? + $3?) }
+Nodes -> Result<Vec<Node>, ()>:
+    Nodes Node { flattenr($1, $2) }
+  | { Ok(vec![]) }
+  ;
+
+Node -> Result<Node, ()>:
+      Node 'ADD' Term {
+        Ok(Node::Add{ 
+          lhs: Box::new($1?), 
+          rhs: Box::new($3?) 
+        })
+      }
     | Term { $1 }
     ;
 
-Term -> Result<u64, ()>:
-      Term 'MUL' Factor { Ok($1? * $3?) }
+Term -> Result<Node, ()>:
+      Term 'MUL' Factor {
+        Ok(Node::Mul{  
+          lhs: Box::new($1?), 
+          rhs: Box::new($3?) 
+        })
+      }
     | Factor { $1 }
     ;
 
-Factor -> Result<u64, ()>:
-      'LPAR' Expr 'RPAR' { $2 }
-    | 'INTEGER'
-      {
-          let v = $1.map_err(|_| ())?;
-          parse_int($lexer.span_str(v.span()))
+Factor -> Result<Node, ()>:
+      'LPAR' Node 'RPAR' { $2 }
+    | 'INTEGER' { 
+        match $1.map_err(|err| format!("Parsing Error: {}", err)) {
+            Ok(s) => {
+              let s = $lexer.span_str(s.span());
+              match s.parse::<u64>() {
+                  Ok(n_val) => Ok(Node::Number{ value: n_val }),
+                  Err(_) => Err(())
+              }
+            }
+            Err(_) => Err(())
+        }
       }
     ;
 %%
+use crate::ast::Node;
 
-fn parse_int(s: &str) -> Result<u64, ()> {
-    match s.parse::<u64>() {
-        Ok(val) => Ok(val),
-        Err(_) => Err(())
-    }
+/// Flatten `rhs` into `lhs`.
+fn flattenr<T>(lhs: Result<Vec<T>, ()>, rhs: Result<T, ()>) -> Result<Vec<T>, ()> {
+    let mut flt = lhs?;
+    flt.push(rhs?);
+    Ok(flt)
 }

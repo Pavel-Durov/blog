@@ -1,6 +1,6 @@
 #[derive(Debug)]
-pub enum Opcode {
-    Add { lhs: Box<Opcode>, rhs: Box<Opcode> },
-    Mul { lhs: Box<Opcode>, rhs: Box<Opcode> },
+pub enum Node {
+    Add { lhs: Box<Node>, rhs: Box<Node> },
+    Mul { lhs: Box<Node>, rhs: Box<Node> },
     Number { value: u64 },
 }
