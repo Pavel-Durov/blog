@@ -5,12 +5,12 @@ do
     echo " "
 done
 
-FONT="DOS Rebel"
+FONT="Jacky"
 THEME=""
 
-ascii-themes generate --font="${FONT}" --themeName=${THEME} --text='   "Hello, World!"'
-ascii-themes generate --font="${FONT}" --themeName=${THEME} --text="   with"
-ascii-themes generate --font="${FONT}" --themeName=${THEME} --text="   Make and CMake"
+ascii-themes generate --font="${FONT}" --themeName=${THEME} --text='   SDK DX '
+ascii-themes generate --font="${FONT}" --themeName=${THEME} --text="   and"
+ascii-themes generate --font="${FONT}" --themeName=${THEME} --text="   Code Evolution"
 
 # echo ""
 # echo ""
