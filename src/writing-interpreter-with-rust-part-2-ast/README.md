@@ -415,6 +415,3 @@ We talked briefly about tests, and showed how can we restructure our code to mak
 This article was written for my own sake of understanding and the organisation of my thoughts as it was about knowledge sharing. 
 
 I trust that it proved valuable!
-
-
-Ref: https://github.com/softdevteam/pavel.yaiwr/commit/83512dd491b15f73369a80ef6aad7c8736ad8c4c
