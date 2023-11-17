@@ -1,12 +1,15 @@
-# Messaging Patterns in Distrebuted Systems
+# Messaging Patterns in Distributed Systems
 
 # Abstract
-TODO:...
+
+In this article, we're going to cover multiple communication patterns in distributed systems. This is by far not an exhaustive list of all the patterns, but if should give a good understanding of the problem space and different approaches to communication design in cloud-based systems.
 
 # Introduction
-TODO:...
 
-# Patterns
+In distributed systems, we're dealing with multiple machines that communicate with each other over a netwtork. This communication can be done directly via one of the networking protocols or via messaging layers.
+There are different ways to architect communication in distributed systems. We're going to review these patterns on a high level and list their advantages and shortcomings.
+
+# Messaging Patterns
 
 ## Request-Reply (Request-Response)
 
@@ -15,6 +18,14 @@ This pattern is the most common use as it involves only networking and no additi
 The actual communication protocol can vary. The HTTP and RPC are just a few examples.
 
 Here, both parties; Client and Server are tightly coupled, i.e. there is no abstraction between them.
+
+
+Advantages:
+
+This pattern is one of the most straightforward ones. Its easy to understand and implement.
+
+Disadvantages:
+It has limitted scalability. Point-to-point messaging may not scale well for large systems with many producers and consumers. It creates fragile, tight coupling between distrebuted components.
 
 
 ## Message Queue (Point-to-Point or Direct-Messaging):
