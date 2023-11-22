@@ -1,4 +1,4 @@
-## File Comparison - A Practical Guide to Working with Diff and Patch Files"
+## File Comparison - Working with Diff and Patch commands"
 
 ## Abstract
 
