@@ -1,4 +1,4 @@
-## File Comparison - Working with Diff and Patch commands
+## File Comparison: A Practical Exploration of diff, patch, and Git Commands
 
 ## Abstract
 
