@@ -1,14 +1,16 @@
-## File Comparison - Working with Diff and Patch commands"
+## File Comparison - Working with Diff and Patch commands
 
 ## Abstract
 
-This article explores file comparison techniques through the practical utilization of diff and patch CLI commands. 
-It will cover the difference between context and unified format and illustrate how to generate and apply patch files locally.
-
+In this article, we will explore file comparison techniques through the practical utilization of diff and patch Unix command-line utilities. 
+We will cover how to compare files using context and unified formats and illustrate how to generate and apply patch files as well as show how can we work with patch files in git repositories.
 
 ## Introduction
 
-Let's say we have two text files, file1.txt and file2.txt and we want to compare them. 
+Let's say we have two text files, `file1.py` and `file2.py` and we want to compare them. 
+It doesn't matter what is the content of the files, as long as they have different content.
+
+Content of `file1.py`:
 
 ```python 
 def main():
@@ -20,6 +22,8 @@ if __name__ == "__main__":
     main()
 
 ```
+
+Content of `file2.py`:
 
 ```python
 import sys
@@ -34,27 +38,20 @@ if __name__ == "__main__":
     main()
 
 ```
-## Generating diff files
+One way of comparing files is through a manual process, you put them side by side and eyeball the changes.
+But this approach is error-prune. 
 
-Of course, one of the ways to compare file content is just by eyeballing both files. But this approach is not error-prune, and after doing it for a while, we get tired and make more mistakes.
+Let's see how can we use command line tools to help us with this task.
+
+## Diff and Patch files
+
+The `diff` command can be used to get the difference between both files. This difference, when saved as a file is called `patch.file`.
 
 
-We can use the `diff` command to see the difference between both files. 
+Let's see it in action:
 
-Let's check the `diff`  manual first:
-```shell
-$ man diff
-NAME
-     diff – differential file and directory comparator
-```
-
-Let's run it:
 ```shell
 $ diff file1.py file2.py 
-```
-
-Which should produce this output:
-```diff
 1,3d0
 < import sys
 < 
@@ -65,13 +62,10 @@ Which should produce this output:
 >     for i in range(10):
 ```
 
-that's useful but we can do better:
+That's useful but we can do better:
 
 ```shell
-diff -u -L "RIGHT" -L "WRONG"  file1.py file2.py 
-```
-output:
-```diff
+$ diff -u -L "RIGHT" -L "WRONG"  file1.py file2.py 
 --- RIGHT
 +++ WRONG
 @@ -1,8 +1,5 @@
@@ -86,21 +80,20 @@ output:
 ```
 
 Here, we gave our file labels using `-L` arguments and set it to be unified diff.
-
-We could also use context diff using `-c` instead of `-u`, let's talk about that birefly.
+We could also use context diff using `-c` instead of `-u`, let's talk about that briefly.
 
 ## Conext diff vs Unified diff
 
-Context diff and Unified diff are two formats of diff command outpur that represent the differences between two files. 
-Each has its advantages in different scenarios.
+Context diff and Unified diff are two formats of diff command output. It represents the changes in a human-readable format, making it easier to understand the difference. 
 
+Without going into too much details, lets compare these formats.
 
 ### Context Diff 
 
+Example:
 
-Looks something like that:
 ```shell
-diff  -c -L "RIGHT" -L "WRONG"  file1.py file2.py 
+$ diff  -c -L "RIGHT" -L "WRONG"  file1.py file2.py 
 *** RIGHT
 --- WRONG
 ***************
@@ -118,13 +111,14 @@ diff  -c -L "RIGHT" -L "WRONG"  file1.py file2.py
 !     for i in range(10):
           print("Hello, World!")
 ```
-This format provides a more extensive context for the difference.
-Each change block begins with *** and --- and it shows several lines of unchanged content around each change.
+This format provides an extensive context of the difference as it shows several lines of unchanged content around each change.
 
 ### Unified Diff
 
+Example:
+
 ```shell
-diff  -u -L "RIGHT" -L "WRONG"  file1.py file2.py 
+$ diff -u -L "RIGHT" -L "WRONG"  file1.py file2.py 
 --- RIGHT
 +++ WRONG
 @@ -1,8 +1,5 @@
@@ -136,21 +130,28 @@ diff  -u -L "RIGHT" -L "WRONG"  file1.py file2.py
 +    for i in range(10):
          print("Hello, World!")
 ```
-This format is more compact compared to the Context diff.
-It shows a unified difference. Each block changes stars with @@.
 
-### Applying diff
+This format is way more compact when compared to the Context diff.
+It shows a unified difference in a concise way, with no context.
 
-One of the cool features of diff is that the diff can be easily applied to a file.
-Let's see how to do so.
+We can work with either format, choose whatever you like.
+I am going to use a unified format in the following sections, just cause I am used to it.
 
-First, we're going to generate a diff file:
+### Applying patch files
+
+One of the cool things that we can do with diff and patch files, is that the patch files can be easily applied to a file.
+That way we can save changes with `diff` and then select what we want when we want it and just apply it!
+
+That might seem like a no-brainer, but the first time I saw it in action I was impressed.
+It's simple, yet powerful.
+
+First, we're going to generate a patch file with diff command:
 
 ```shell
 $ diff  -u -L "RIGHT" -L "WRONG"  file1.py file2.py  > mydiff.diff
 ```
 
-File content:
+Patch file `mydiff.diff` content:
 
 ```shell
 $ cat mydiff.diff
@@ -166,23 +167,14 @@ $ cat mydiff.diff
          print("Hello, World!")
 ```
 
-Let's apply this diff to one of the files.
-
-Let's check the `patch` manual first:
-```shell
-$ man patch
-NAME
-    patch – apply a diff file to an original
-```
-
-For that we're going to use `patch` command:
+Next, we're going to apply it to one of the files using `patch` command.
 
 ```shell
 $ patch -b file1.py < ./mydiff.diff 
 patching file 'file1.py'
 ```
 And that's it, we have the changes from `file2.py` applied to `file1.py`.
-Since we specified `-b` the patch also created a backup file with the original content.
+Since we specified `-b` flag the `patch` also created a backup file with the original content.
 
 Both files should look something like this:
 
@@ -211,17 +203,67 @@ if __name__ == "__main__":
     main()
 
 ```
+I think it's pretty cool!
+
 I found this especially useful when I'm debugging program outputs locally and I need to keep track of and compare different output versions over time.
 Or when I need to share quickly my local changes with someone else.
-Of course, we can use `git` to track history, but sometimes working with diff files directly is faster and more straightforward.
-We can also apply these diff files with git using `git apply`.
+Of course, we can use `git` to track file history, but sometimes working with `diff` and patch files directly is more straightforward.
 
+## Using Patches in Git
+
+We're going to illustrate one of the ways of working with patch files in git.
+This is by far not an extensive guide but it should give a general feeling of how it works.
+
+We're going to create a patch file from one branch and apply it to another branch using built-in git commands.
+
+Let's create new project and init git repo:
+```shell
+$ mkdir git-patch-example  && cd git-patch-example && git init
+$ echo "init change" > file.txt # make some changes
+$ git add  file.txt && git commit -m "init commit" # add file and commit
+```
+
+Create a side branch with some changes:
+```shell
+$ git checkout -b branchA # create new branch
+$ echo "another change" > file.txt # make some changes
+$ git add ./patchMe.txt && git commit -m "test commit" # add file and commit
+```
+
+Generate a patch file:
+```shell
+$ git format-patch main -o patches/ # Generate a patch. It will be stored in a "patches" directory.
+patches/0001-test-commit.patch
+```
+Let's see the patch file content
+That should look familiar!
+
+Let's create yet another branch from `main` and apply the patch:
+
+```shell
+$ git checkout main && git checkout -b branchB
+$ git apply patches/0001-test-commit.patch # apply the patch
+```
+That should apply the changes from the patch file to the branch.
+
+```shell
+$ git diff file.txt
+diff --git a/file.txt b/file.txt
+index 048b6a9..0a131d8 100644
+--- a/file.txt
++++ b/file.txt
+@@ -1 +1 @@
+-init change
++another change
+```
+I hope it's obvious these patch files can be useful when comparing changes.
+In the real-world, these patch files can also be shared between developers or applied changes across different git repositories.
 
 ## Summary
 
-In this article we explored file comparison through the practical utilization of diff and patch files.
+In this article, we explored file comparison through the practical utilization of `diff` and `patch` commands.
 
-We eplained the diffrence fo context and unified diff format and provided practical instruction on how to apply patch files.
+We explained the difference between context and unified formats and provided practical examples of how to work with patch files in general and when working with git repositories.
 
 This article was written for my own sake of understanding and the organisation of my thoughts as it was about knowledge sharing.
 
