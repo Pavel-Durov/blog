@@ -1,4 +1,4 @@
-## File Comparison: A Practical Exploration of diff, patch, and Git Commands
+## File Comparison and Patching in Unix Environments and Git
 
 ## Abstract
 
@@ -38,14 +38,13 @@ if __name__ == "__main__":
     main()
 
 ```
-One way of comparing files is through a manual process, you put them side by side and eyeball the changes.
-But this approach is error-prune. 
+One way of comparing files is through a manual process, you put them side by side and eyeball the changes. But this approach is error-prune. 
 
 Let's see how can we use command line tools to help us with this task.
 
 ## Diff and Patch files
 
-The `diff` command can be used to get the difference between both files. This difference, when saved as a file is called `patch.file`.
+The `diff` command can be used to get the difference between both files. This difference, when saved as a file is called patch file.
 
 
 Let's see it in action:
@@ -62,35 +61,16 @@ $ diff file1.py file2.py
 >     for i in range(10):
 ```
 
-That's useful but we can do better:
+That default format of the diff output is a context format.
+Without going into too much details, let's talk about diff formats.
 
-```shell
-$ diff -u -L "RIGHT" -L "WRONG"  file1.py file2.py 
---- RIGHT
-+++ WRONG
-@@ -1,8 +1,5 @@
--import sys
--
--
- def main():
--    for i in range(int(sys.argv[1])):
-+    for i in range(10):
-         print("Hello, World!")
- 
-```
-
-Here, we gave our file labels using `-L` arguments and set it to be unified diff.
-We could also use context diff using `-c` instead of `-u`, let's talk about that briefly.
-
-## Conext diff vs Unified diff
+## Conext vs Unified format
 
 Context diff and Unified diff are two formats of diff command output. It represents the changes in a human-readable format, making it easier to understand the difference. 
 
-Without going into too much details, lets compare these formats.
+Without going into too much detail, let's compare these formats.
 
 ### Context Diff 
-
-Example:
 
 ```shell
 $ diff  -c -L "RIGHT" -L "WRONG"  file1.py file2.py 
@@ -111,11 +91,11 @@ $ diff  -c -L "RIGHT" -L "WRONG"  file1.py file2.py
 !     for i in range(10):
           print("Hello, World!")
 ```
+Here, we gave our file labels using the `-L` argument and set it to use context format using the `-c` flag (that's also the default option).
 This format provides an extensive context of the difference as it shows several lines of unchanged content around each change.
 
 ### Unified Diff
 
-Example:
 
 ```shell
 $ diff -u -L "RIGHT" -L "WRONG"  file1.py file2.py 
@@ -131,10 +111,9 @@ $ diff -u -L "RIGHT" -L "WRONG"  file1.py file2.py
          print("Hello, World!")
 ```
 
-This format is way more compact when compared to the Context diff.
-It shows a unified difference in a concise way, with no context.
-
-We can work with either format, choose whatever you like.
+Here, we gave our file labels using `-L` argument and set it to be a unified format using the `-u` flag.
+This format is way more compact when compared to the context format, it shows a unified difference in a concise way, with no context.
+We can work with either format, choose whatever you like. 
 I am going to use a unified format in the following sections, just cause I am used to it.
 
 ### Applying patch files
@@ -142,8 +121,7 @@ I am going to use a unified format in the following sections, just cause I am us
 One of the cool things that we can do with diff and patch files, is that the patch files can be easily applied to a file.
 That way we can save changes with `diff` and then select what we want when we want it and just apply it!
 
-That might seem like a no-brainer, but the first time I saw it in action I was impressed.
-It's simple, yet powerful.
+That might seem like a no-brainer, but the first time I saw it in action I was really impressed. It's simple, yet very powerful.
 
 First, we're going to generate a patch file with diff command:
 
@@ -176,51 +154,23 @@ patching file 'file1.py'
 And that's it, we have the changes from `file2.py` applied to `file1.py`.
 Since we specified `-b` flag the `patch` also created a backup file with the original content.
 
-Both files should look something like this:
+If you check file1.py it should be identical to `file2.py` since we applied the diff from `file2.py` to `file1.py`.
 
-```shell
-$ cat file1.py
-def main():
-    for i in range(10):
-        print("Hello, World!")
+I found this especially useful when I'm debugging program outputs locally and I need to keep track and compare different versions of the oputput over time. Or when I need to share quickly my local changes with someone else.
 
-
-if __name__ == "__main__":
-    main()
-```
-
-```shell
-$ cat file1.py.orig 
-import sys
-
-
-def main():
-    for i in range(int(sys.argv[1])):
-        print("Hello, World!")
-
-
-if __name__ == "__main__":
-    main()
-
-```
-I think it's pretty cool!
-
-I found this especially useful when I'm debugging program outputs locally and I need to keep track of and compare different output versions over time.
-Or when I need to share quickly my local changes with someone else.
-Of course, we can use `git` to track file history, but sometimes working with `diff` and patch files directly is more straightforward.
+Of course, we can use git to track file history, but sometimes working with diff and patch files directly can be more straightforward.
 
 ## Using Patches in Git
 
-We're going to illustrate one of the ways of working with patch files in git.
-This is by far not an extensive guide but it should give a general feeling of how it works.
+Here we're going to illustrate one of the ways of working with patch files in Git. This is by far not an extensive guide but it should give a general feeling of how it works.
 
 We're going to create a patch file from one branch and apply it to another branch using built-in git commands.
 
-Let's create new project and init git repo:
+Let's create a new project and init git repo:
 ```shell
 $ mkdir git-patch-example  && cd git-patch-example && git init
 $ echo "init change" > file.txt # make some changes
-$ git add  file.txt && git commit -m "init commit" # add file and commit
+$ git add file.txt && git commit -m "init commit" # add file and commit
 ```
 
 Create a side branch with some changes:
@@ -235,7 +185,22 @@ Generate a patch file:
 $ git format-patch main -o patches/ # Generate a patch. It will be stored in a "patches" directory.
 patches/0001-test-commit.patch
 ```
-Let's see the patch file content
+Let's see the patch file content:
+```shell
+$ cat patches/0001-test-commit.patch
+
+---
+ file.txt | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/file.txt b/file.txt
+index 17819c8..e69de29 100644
+--- a/file.txt
++++ b/file.txt
+@@ -1 +0,0 @@
+-init change
+--
+```
 That should look familiar!
 
 Let's create yet another branch from `main` and apply the patch:
