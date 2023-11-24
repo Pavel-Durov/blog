@@ -211,16 +211,6 @@ $ git apply patches/0001-test-commit.patch # apply the patch
 ```
 That should apply the changes from the patch file to the branch.
 
-```shell
-$ git diff file.txt
-diff --git a/file.txt b/file.txt
-index 048b6a9..0a131d8 100644
---- a/file.txt
-+++ b/file.txt
-@@ -1 +1 @@
--init change
-+another change
-```
 I hope it's obvious these patch files can be useful when comparing changes.
 In the real-world, these patch files can also be shared between developers or applied changes across different git repositories.
 
@@ -228,7 +218,7 @@ In the real-world, these patch files can also be shared between developers or ap
 
 In this article, we explored file comparison through the practical utilization of `diff` and `patch` commands.
 
-We explained the difference between context and unified formats and provided practical examples of how to work with patch files in general and when working with git repositories.
+We explained the difference between context and unified formats and provided practical examples of how to work with patch files in Unix based environment and when working with Git repositories.
 
 This article was written for my own sake of understanding and the organisation of my thoughts as it was about knowledge sharing.
 
