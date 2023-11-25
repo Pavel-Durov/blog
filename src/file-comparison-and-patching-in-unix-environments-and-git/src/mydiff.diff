@@ -1,0 +1,12 @@
+--- RIGHT
++++ WRONG
+@@ -1,8 +1,5 @@
+-import sys
+-
+-
+ def main():
+-    for i in range(int(sys.argv[1])):
++    for i in range(10):
+         print("Hello, World!")
+ 
+ 
