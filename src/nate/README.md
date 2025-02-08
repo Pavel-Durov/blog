@@ -5,7 +5,7 @@
 I joined nate as the first Software Engineer alongside the CEO and a small group of Data Scientists. After a while, I progressed naturally into Tech Lead leading the engineering function0, a couple of years later I moved to a CTO role and finally to a Principle Engineer. In this article, I will overview the learnings and the experience I had while growing with the company from a family-size team of 5 based in London to a company of 160 people across New York and London offices.
 
 ## Funding
-+ Pre-seed Jan 17, 2019	
++ Pre-seed Jan 17, 2019
 + Seed Round - Mar 27, 2020	
 + Series A - Jun 17, 2021	
 

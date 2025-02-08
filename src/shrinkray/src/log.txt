@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "/Users/pd/git-repos/Pavel-Durov/blog/src/shrinkray/src/sum_even.py", line 10, in <module>
+    assert sum_even_numbers(numbers) == 12, "Expected 12, but got 9"
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Expected 12, but got 9

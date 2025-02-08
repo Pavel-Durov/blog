@@ -1,0 +1,10 @@
+def sum_even_numbers(numbers):
+    total = 0
+    for num in numbers:
+        if num % 2 == 1:  # Bug: Should be num % 2 == 0
+            total += num
+    return totale
+
+# Test case
+numbers = [1, 2, 3, 4, 5, 6]
+assert sum_even_numbers(numbers) == 12, "Expected 12, but got 9"
